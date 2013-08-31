@@ -1,5 +1,7 @@
 package it.gianlucacarlesso.checkers.view;
 
+import java.util.ArrayList;
+
 import it.gianlucacarlesso.checkers.R;
 import it.gianlucacarlesso.checkers.logic.Board;
 import it.gianlucacarlesso.checkers.logic.Piece;
@@ -14,6 +16,7 @@ import android.graphics.PointF;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 public class GBoard extends View {
 	private static Point SIZE_BOARD_ORIGIN = new Point(1319, 1406);
@@ -90,26 +93,36 @@ public class GBoard extends View {
 					(float) matrix[current_selected.x][current_selected.y].y
 							+ (float) ((box_size_y - image_piece.getHeight()) / 2.0),
 					null);
+			
+			// Retrieving all the possible moves of the pawn selected
+			ArrayList<Point> moves = current_selected.possibleMoves(board_logic
+					.getBoard(), getContext());
 
-			canvas.drawBitmap(
-					piece_black_possible,
-					(float) ((float) matrix[current_selected.x - 1][current_selected.y].x
-							+ (pos_x / 2.0) + correct),
-					(float) matrix[current_selected.x - 1][current_selected.y].y
-							+ (float) ((box_size_y - image_piece.getHeight()) / 2.0),
-					null);
+			for (int i = 0; i < moves.size(); i++) {
+				canvas.drawBitmap(
+						piece_black_possible,
+						(float) ((float) matrix[moves.get(i).x][moves.get(i).y].x
+								+ (pos_x / 2.0) + correct),
+						(float) matrix[moves.get(i).x][moves.get(i).y].y
+								+ (float) ((box_size_y - image_piece.getHeight()) / 2.0),
+						null);
+			}
 			current_selected = null;
 		}
 	}
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
+		// Recovering the coordinates of the touch
 		float x = event.getX();
 		float y = event.getY();
 
 		for (int i = 0; i < Board.NUM_BOX_ROW; i++) {
 			for (int j = 0; j < Board.NUM_BOX_ROW; j++) {
-				if (matrix[i][j].x <= x && matrix[i][j].x + box_size_x >= x
+				if (matrix[i][j].x <= x
+						&& matrix[i][j].x + box_size_x >= x
+						// Individual touched the box and if present a pawn
+						// visualize the boxes where they can move
 						&& matrix[i][j].y <= y
 						&& matrix[i][j].y + box_size_y >= y) {
 

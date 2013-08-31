@@ -25,6 +25,10 @@ public class Board {
 	public Piece[] getPlayerWhite() {
 		return player_white;
 	}
+	
+	public Piece[][] getBoard() {
+		return board;
+	}
 
 	private void initBoard(int xpos, int ypos, int player, boolean alternate,
 			Piece[] player_pieces) {
