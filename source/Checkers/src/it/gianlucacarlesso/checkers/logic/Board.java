@@ -1,5 +1,11 @@
 package it.gianlucacarlesso.checkers.logic;
 
+import java.util.ArrayList;
+
+import android.content.Context;
+import android.graphics.Point;
+import android.widget.Toast;
+
 public class Board {
 	public static final int PLAYER_PIECES = 12;
 	public static int NUM_BOX_ROW = 8;
@@ -25,7 +31,7 @@ public class Board {
 	public Piece[] getPlayerWhite() {
 		return player_white;
 	}
-	
+
 	public Piece[][] getBoard() {
 		return board;
 	}
@@ -47,6 +53,35 @@ public class Board {
 				}
 
 				xpos += 1;
+			}
+		}
+	}
+
+	public void moveTo(Piece piece, Point point, Context context) {
+		ArrayList<Point> moves = piece.possibleMoves(board);
+
+		for (int i = 0; i < moves.size(); i++) {
+			if (moves.get(i).x == point.x && moves.get(i).y == point.y) {
+				board[point.x][point.y] = piece;
+				board[piece.x][piece.y] = null;
+
+				// Checking if I have to remove a checker of the opponent
+				if (Math.abs(piece.x - point.x) > 1) {
+					int dir_x = 1;
+					if (piece.x > point.x) {
+						dir_x = -1;
+					}
+
+					int dir_y = 1;
+					if (piece.y > point.y) {
+						dir_y = -1;
+					}
+					board[piece.x + dir_x][piece.y + dir_y] = null;
+				}
+
+				piece.x = point.x;
+				piece.y = point.y;
+				i = moves.size();
 			}
 		}
 	}

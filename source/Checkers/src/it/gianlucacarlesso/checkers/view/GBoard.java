@@ -37,6 +37,7 @@ public class GBoard extends View {
 	private PointF[][] matrix = new PointF[Board.NUM_BOX_ROW][Board.NUM_BOX_ROW];
 	private Piece current_selected = null;
 	private float correct = 0;
+	private ArrayList<Point> moves = null;
 
 	float box_size_x;
 	float box_size_y;
@@ -93,21 +94,27 @@ public class GBoard extends View {
 					(float) matrix[current_selected.x][current_selected.y].y
 							+ (float) ((box_size_y - image_piece.getHeight()) / 2.0),
 					null);
-			
-			// Retrieving all the possible moves of the pawn selected
-			ArrayList<Point> moves = current_selected.possibleMoves(board_logic
-					.getBoard(), getContext());
 
+			// Retrieving all the possible moves of the pawn selected
+			moves = current_selected.possibleMoves(board_logic.getBoard());
+
+			// I visualize the images of possible moves depending on the
+			// player's turn
+			Bitmap possible_image = piece_black_possible;
+			if (current_selected.player == Piece.PLAYER_WHITE) {
+				possible_image = piece_white_possible;
+			}
+			Toast.makeText(context, "Mosse:" + moves.size(), Toast.LENGTH_SHORT)
+					.show();
 			for (int i = 0; i < moves.size(); i++) {
 				canvas.drawBitmap(
-						piece_black_possible,
+						possible_image,
 						(float) ((float) matrix[moves.get(i).x][moves.get(i).y].x
 								+ (pos_x / 2.0) + correct),
 						(float) matrix[moves.get(i).x][moves.get(i).y].y
-								+ (float) ((box_size_y - image_piece.getHeight()) / 2.0),
-						null);
+								+ (float) ((box_size_y - image_piece
+										.getHeight()) / 2.0), null);
 			}
-			current_selected = null;
 		}
 	}
 
@@ -117,6 +124,7 @@ public class GBoard extends View {
 		float x = event.getX();
 		float y = event.getY();
 
+		boolean disabled_current_selected = true;
 		for (int i = 0; i < Board.NUM_BOX_ROW; i++) {
 			for (int j = 0; j < Board.NUM_BOX_ROW; j++) {
 				if (matrix[i][j].x <= x
@@ -130,14 +138,30 @@ public class GBoard extends View {
 						current_selected = new Piece(i, j,
 								board_logic.board[i][j].player);
 						this.invalidate();
+						disabled_current_selected = false;
 					} else {
-						current_selected = null;
+						if (moves != null) {
+							// I run the player's move
+							for (int k = 0; k < moves.size(); k++) {
+								// Checking that the move is valid
+								if (moves.get(k).x == i && moves.get(k).y == j) {
+									board_logic.moveTo(current_selected,
+											new Point(i, j), context);
+									k = moves.size();
+									disabled_current_selected = false;
+									this.invalidate();
+								}
+							}
+						}
 					}
 
 					i = Board.NUM_BOX_ROW + 1;
 					j = Board.NUM_BOX_ROW + 1;
 				}
 			}
+		}
+		if (disabled_current_selected == true) {
+			current_selected = null;
 		}
 		return false;
 	}
