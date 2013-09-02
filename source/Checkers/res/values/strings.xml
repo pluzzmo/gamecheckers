@@ -6,6 +6,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="iavsia">IA vs IA</string>
     <string name="menvsia">Man vs IA</string>
+    <string name="menvsman">Man vs Man</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_checkerboard">CheckerboardActivity</string>
     <string name="copyright">\u00A9 Copyright 2013</string>

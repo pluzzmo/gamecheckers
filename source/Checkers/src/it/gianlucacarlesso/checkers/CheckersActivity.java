@@ -55,6 +55,9 @@ public class CheckersActivity extends Activity {
 
 		button = (Button) findViewById(R.id.button_manvsia);
 		button.setTypeface(typface);
+		
+		button = (Button) findViewById(R.id.button_manvsman);
+		button.setTypeface(typface);
 
 		title = (TextView) findViewById(R.id.copyright);
 		title.setTypeface(typface);
@@ -70,8 +73,10 @@ public class CheckersActivity extends Activity {
 
 		if (view.getId() == R.id.button_iavsia) {
 			intent.putExtra(CheckerboardActivity.GAME_MODE, 0);
-		} else {
+		} else if(view.getId() == R.id.button_manvsia) {
 			intent.putExtra(CheckerboardActivity.GAME_MODE, 1);
+		} else {
+			intent.putExtra(CheckerboardActivity.GAME_MODE, 2);
 		}
 		startActivity(intent);
 	}

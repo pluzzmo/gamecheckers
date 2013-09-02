@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:layout_marginBottom="40dp"
+            android:layout_marginBottom="50dp"
             android:orientation="vertical" >
 
             <TextView
@@ -28,7 +28,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginBottom="75dp"
+                android:layout_marginBottom="45dp"
                 android:layout_marginTop="0dp"
                 android:gravity="center"
                 android:text="@string/app_name"
@@ -48,12 +48,13 @@
                 android:paddingTop="10dp"
                 android:text="@string/iavsia"
                 android:textColor="#ffffff"
-                android:textSize="50sp" />
+                android:textSize="45sp" />
 
             <Button
                 android:id="@+id/button_manvsia"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
                 android:background="@drawable/game_button"
                 android:onClick="startCheckerBoard"
                 android:paddingBottom="10dp"
@@ -62,7 +63,21 @@
                 android:paddingTop="10dp"
                 android:text="@string/menvsia"
                 android:textColor="#ffffff"
-                android:textSize="50sp" />
+                android:textSize="45sp" />
+
+            <Button
+                android:id="@+id/button_manvsman"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/game_button"
+                android:onClick="startCheckerBoard"
+                android:paddingBottom="10dp"
+                android:paddingLeft="30dp"
+                android:paddingRight="30dp"
+                android:paddingTop="10dp"
+                android:text="@string/menvsman"
+                android:textColor="#ffffff"
+                android:textSize="45sp" />
         </LinearLayout>
 
         <TextView
