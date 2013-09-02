@@ -59,7 +59,8 @@ public class Board {
 		}
 	}
 
-	public int moveTo(Piece piece, Point point, Context context, boolean isSpecialTurn) {
+	public int moveTo(Piece piece, Point point, Context context,
+			boolean isSpecialTurn) {
 		ArrayList<Point> moves = piece.possibleMoves(board, isSpecialTurn);
 		int result = NO_MOVE;
 		for (int i = 0; i < moves.size(); i++) {
@@ -87,6 +88,14 @@ public class Board {
 				piece.x = point.x;
 				piece.y = point.y;
 				i = moves.size();
+
+				// The pawn has become a lady
+				if (piece.player == Piece.PLAYER_BLACK
+						&& piece.x == board.length - 1) {
+					piece.dama = true;
+				} else if (piece.player == Piece.PLAYER_WHITE && piece.x == 0) {
+					piece.dama = true;
+				}
 			}
 		}
 		return result;

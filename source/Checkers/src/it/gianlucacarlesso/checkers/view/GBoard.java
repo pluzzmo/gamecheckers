@@ -16,7 +16,6 @@ import android.graphics.PointF;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
 public class GBoard extends View {
 	private static Point SIZE_BOARD_ORIGIN = new Point(1319, 1406);
@@ -29,9 +28,15 @@ public class GBoard extends View {
 	private Bitmap piece_black;
 	private Bitmap piece_black_selected;
 	private Bitmap piece_black_possible;
+	private Bitmap piece_black_dama;
+	private Bitmap piece_black_selected_dama;
+	private Bitmap piece_black_possible_dama;
 	private Bitmap piece_white;
 	private Bitmap piece_white_selected;
 	private Bitmap piece_white_possible;
+	private Bitmap piece_white_dama;
+	private Bitmap piece_white_selected_dama;
+	private Bitmap piece_white_possible_dama;
 	private float shadow = 17;
 	private Point screen_size;
 	private PointF[][] matrix = new PointF[Board.NUM_BOX_ROW][Board.NUM_BOX_ROW];
@@ -84,9 +89,17 @@ public class GBoard extends View {
 		if (current_selected != null) {
 			Bitmap image_piece = null;
 			if (Piece.PLAYER_BLACK == current_selected.player) {
-				image_piece = piece_black_selected;
+				if (!current_selected.dama) {
+					image_piece = piece_black_selected;
+				} else {
+					image_piece = piece_black_selected_dama;
+				}
 			} else if (Piece.PLAYER_WHITE == current_selected.player) {
-				image_piece = piece_white_selected;
+				if (!current_selected.dama) {
+					image_piece = piece_white_selected;
+				} else {
+					image_piece = piece_white_selected_dama;
+				}
 			}
 
 			canvas.drawBitmap(
@@ -98,14 +111,27 @@ public class GBoard extends View {
 					null);
 
 			// Retrieving all the possible moves of the pawn selected
-			moves = current_selected.possibleMoves(board_logic.getBoard(), specialTurn!= null && specialTurn.x == current_selected.x && specialTurn.y == current_selected.y);
+			moves = current_selected.possibleMoves(board_logic.getBoard(),
+					specialTurn != null && specialTurn.x == current_selected.x
+							&& specialTurn.y == current_selected.y);
 
 			// I visualize the images of possible moves depending on the
 			// player's turn
-			Bitmap possible_image = piece_black_possible;
-			if (current_selected.player == Piece.PLAYER_WHITE) {
-				possible_image = piece_white_possible;
+			Bitmap possible_image = null;
+			if (current_selected.player == Piece.PLAYER_BLACK) {
+				if (!current_selected.dama) {
+					possible_image = piece_black_possible;
+				} else {
+					possible_image = piece_black_possible_dama;
+				}
+			} else if (current_selected.player == Piece.PLAYER_WHITE) {
+				if (!current_selected.dama) {
+					possible_image = piece_white_possible;
+				} else {
+					possible_image = piece_white_possible_dama;
+				}
 			}
+
 			for (int i = 0; i < moves.size(); i++) {
 				canvas.drawBitmap(
 						possible_image,
@@ -139,7 +165,7 @@ public class GBoard extends View {
 								|| (specialTurn != null
 										&& specialTurn.x == board_logic.board[i][j].x && specialTurn.y == board_logic.board[i][j].y)) {
 							current_selected = new Piece(i, j,
-									board_logic.board[i][j].player);
+									board_logic.board[i][j].player, board_logic.board[i][j].dama);
 							this.invalidate();
 							disabled_current_selected = false;
 						}
@@ -151,10 +177,11 @@ public class GBoard extends View {
 								if (moves.get(k).x == i && moves.get(k).y == j) {
 									Piece oldSpecialTurn = new Piece(
 											current_selected.x,
-											current_selected.y);
+											current_selected.y, current_selected.player, current_selected.dama);
 									int result = board_logic.moveTo(
 											current_selected, new Point(i, j),
-											context, current_selected == specialTurn);
+											context,
+											current_selected == specialTurn);
 
 									// If the player who moved is that of the
 									// current round: shift change, but if I ran
@@ -245,12 +272,24 @@ public class GBoard extends View {
 				R.drawable.piece_black_horizontal_selected);
 		piece_black_possible = BitmapFactory.decodeResource(res,
 				R.drawable.piece_black_horizontal_possible);
+		piece_black_dama = BitmapFactory.decodeResource(res,
+				R.drawable.piece_black_horizontal_dama);
+		piece_black_selected_dama = BitmapFactory.decodeResource(res,
+				R.drawable.piece_black_horizontal_selected_dama);
+		piece_black_possible_dama = BitmapFactory.decodeResource(res,
+				R.drawable.piece_black_horizontal_possible_dama);
 		piece_white = BitmapFactory.decodeResource(res,
 				R.drawable.piece_white_horizontal);
 		piece_white_selected = BitmapFactory.decodeResource(res,
 				R.drawable.piece_white_horizontal_selected);
 		piece_white_possible = BitmapFactory.decodeResource(res,
 				R.drawable.piece_white_horizontal_possible);
+		piece_white_dama = BitmapFactory.decodeResource(res,
+				R.drawable.piece_white_horizontal_dama);
+		piece_white_selected_dama = BitmapFactory.decodeResource(res,
+				R.drawable.piece_white_horizontal_selected_dama);
+		piece_white_possible_dama = BitmapFactory.decodeResource(res,
+				R.drawable.piece_white_horizontal_possible_dama);
 
 		float new_x_piece = (int) (board.getWidth() / (Board.NUM_BOX_ROW + 1.3));
 		if (new_x_piece >= box_size_x) {
@@ -265,12 +304,28 @@ public class GBoard extends View {
 				(int) new_x_piece, (int) new_y_piece, false);
 		piece_black_possible = Bitmap.createScaledBitmap(piece_black_possible,
 				(int) new_x_piece, (int) new_y_piece, false);
+		piece_black_dama = Bitmap.createScaledBitmap(piece_black_dama,
+				(int) new_x_piece, (int) new_y_piece, false);
+		piece_black_selected_dama = Bitmap.createScaledBitmap(
+				piece_black_selected_dama, (int) new_x_piece,
+				(int) new_y_piece, false);
+		piece_black_possible_dama = Bitmap.createScaledBitmap(
+				piece_black_possible_dama, (int) new_x_piece,
+				(int) new_y_piece, false);
 		piece_white = Bitmap.createScaledBitmap(piece_white, (int) new_x_piece,
 				(int) new_y_piece, false);
 		piece_white_selected = Bitmap.createScaledBitmap(piece_white_selected,
 				(int) new_x_piece, (int) new_y_piece, false);
 		piece_white_possible = Bitmap.createScaledBitmap(piece_white_possible,
 				(int) new_x_piece, (int) new_y_piece, false);
+		piece_white_dama = Bitmap.createScaledBitmap(piece_white_dama,
+				(int) new_x_piece, (int) new_y_piece, false);
+		piece_white_selected_dama = Bitmap.createScaledBitmap(
+				piece_white_selected_dama, (int) new_x_piece,
+				(int) new_y_piece, false);
+		piece_white_possible_dama = Bitmap.createScaledBitmap(
+				piece_white_possible_dama, (int) new_x_piece,
+				(int) new_y_piece, false);
 
 		// Calculating all the boxes of Damiera
 		float xbox = board_center_x - box_size_x * Board.NUM_BOX_ROW / 2;
@@ -295,9 +350,17 @@ public class GBoard extends View {
 				// Control in the current box there is a pawn
 				if (board_logic.board[i][j] != null) {
 					if (board_logic.board[i][j].player == Piece.PLAYER_BLACK) {
-						image_piece = piece_black;
+						if (!board_logic.board[i][j].dama) {
+							image_piece = piece_black;
+						} else {
+							image_piece = piece_black_dama;
+						}
 					} else {
-						image_piece = piece_white;
+						if (!board_logic.board[i][j].dama) {
+							image_piece = piece_white;
+						} else {
+							image_piece = piece_white_dama;
+						}
 					}
 
 					canvas.drawBitmap(
