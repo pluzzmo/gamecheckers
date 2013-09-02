@@ -39,6 +39,7 @@ public class GBoard extends View {
 	private float correct = 0;
 	private ArrayList<Point> moves = null;
 	private int playerTurn = Piece.PLAYER_WHITE;
+	private Piece specialTurn = null;
 
 	float box_size_x;
 	float box_size_y;
@@ -97,7 +98,7 @@ public class GBoard extends View {
 					null);
 
 			// Retrieving all the possible moves of the pawn selected
-			moves = current_selected.possibleMoves(board_logic.getBoard());
+			moves = current_selected.possibleMoves(board_logic.getBoard(), specialTurn!= null && specialTurn.x == current_selected.x && specialTurn.y == current_selected.y);
 
 			// I visualize the images of possible moves depending on the
 			// player's turn
@@ -134,7 +135,9 @@ public class GBoard extends View {
 						&& matrix[i][j].y + box_size_y >= y) {
 
 					if (board_logic.board[i][j] != null) {
-						if (board_logic.board[i][j].player == playerTurn) {
+						if (board_logic.board[i][j].player == playerTurn
+								|| (specialTurn != null
+										&& specialTurn.x == board_logic.board[i][j].x && specialTurn.y == board_logic.board[i][j].y)) {
 							current_selected = new Piece(i, j,
 									board_logic.board[i][j].player);
 							this.invalidate();
@@ -146,10 +149,20 @@ public class GBoard extends View {
 							for (int k = 0; k < moves.size(); k++) {
 								// Checking that the move is valid
 								if (moves.get(k).x == i && moves.get(k).y == j) {
-									boolean result = board_logic.moveTo(
+									Piece oldSpecialTurn = new Piece(
+											current_selected.x,
+											current_selected.y);
+									int result = board_logic.moveTo(
 											current_selected, new Point(i, j),
-											context);
-									if (result) {
+											context, current_selected == specialTurn);
+
+									// If the player who moved is that of the
+									// current round: shift change, but if I ran
+									// a double move with the previous player
+									// does not shift change.
+									if (result != Board.NO_MOVE
+											&& (specialTurn == null || !(specialTurn != null
+													&& specialTurn.x == oldSpecialTurn.x && specialTurn.y == oldSpecialTurn.y))) {
 										if (playerTurn == Piece.PLAYER_BLACK) {
 											playerTurn = Piece.PLAYER_WHITE;
 										} else {
@@ -157,8 +170,26 @@ public class GBoard extends View {
 										}
 										disabled_current_selected = true;
 									} else {
-										disabled_current_selected = false;
+										if (specialTurn != null
+												&& specialTurn.x == oldSpecialTurn.x
+												&& specialTurn.y == oldSpecialTurn.y) {
+											disabled_current_selected = true;
+										} else {
+											disabled_current_selected = false;
+										}
 									}
+
+									if (result == Board.PAWN_ELIMINATED
+											&& current_selected
+													.eatOpponentPawn(
+															board_logic
+																	.getBoard())
+													.size() > 0) {
+										specialTurn = current_selected;
+									} else {
+										specialTurn = null;
+									}
+
 									k = moves.size();
 									this.invalidate();
 								}

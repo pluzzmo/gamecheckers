@@ -9,6 +9,9 @@ public class Board {
 	public static final int PLAYER_PIECES = 12;
 	public static int NUM_BOX_ROW = 8;
 	public static int PLAYER_ROWS = 3;
+	public static int PAWN_ELIMINATED = 0;
+	public static int NORMAL_MOVE = 1;
+	public static int NO_MOVE = 2;
 
 	private Piece[] player_black = new Piece[PLAYER_PIECES];
 	private Piece[] player_white = new Piece[PLAYER_PIECES];
@@ -56,9 +59,9 @@ public class Board {
 		}
 	}
 
-	public boolean moveTo(Piece piece, Point point, Context context) {
-		ArrayList<Point> moves = piece.possibleMoves(board);
-		boolean result = false;
+	public int moveTo(Piece piece, Point point, Context context, boolean isSpecialTurn) {
+		ArrayList<Point> moves = piece.possibleMoves(board, isSpecialTurn);
+		int result = NO_MOVE;
 		for (int i = 0; i < moves.size(); i++) {
 			if (moves.get(i).x == point.x && moves.get(i).y == point.y) {
 				board[point.x][point.y] = piece;
@@ -76,13 +79,14 @@ public class Board {
 						dir_y = -1;
 					}
 					board[piece.x + dir_x][piece.y + dir_y] = null;
+					result = PAWN_ELIMINATED;
+				} else {
+					result = NORMAL_MOVE;
 				}
 
 				piece.x = point.x;
 				piece.y = point.y;
 				i = moves.size();
-				
-				result = true;
 			}
 		}
 		return result;
