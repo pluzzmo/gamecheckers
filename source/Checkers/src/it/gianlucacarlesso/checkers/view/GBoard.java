@@ -38,6 +38,7 @@ public class GBoard extends View {
 	private Piece current_selected = null;
 	private float correct = 0;
 	private ArrayList<Point> moves = null;
+	private int playerTurn = Piece.PLAYER_WHITE;
 
 	float box_size_x;
 	float box_size_y;
@@ -104,8 +105,6 @@ public class GBoard extends View {
 			if (current_selected.player == Piece.PLAYER_WHITE) {
 				possible_image = piece_white_possible;
 			}
-			Toast.makeText(context, "Mosse:" + moves.size(), Toast.LENGTH_SHORT)
-					.show();
 			for (int i = 0; i < moves.size(); i++) {
 				canvas.drawBitmap(
 						possible_image,
@@ -135,20 +134,32 @@ public class GBoard extends View {
 						&& matrix[i][j].y + box_size_y >= y) {
 
 					if (board_logic.board[i][j] != null) {
-						current_selected = new Piece(i, j,
-								board_logic.board[i][j].player);
-						this.invalidate();
-						disabled_current_selected = false;
+						if (board_logic.board[i][j].player == playerTurn) {
+							current_selected = new Piece(i, j,
+									board_logic.board[i][j].player);
+							this.invalidate();
+							disabled_current_selected = false;
+						}
 					} else {
 						if (moves != null) {
 							// I run the player's move
 							for (int k = 0; k < moves.size(); k++) {
 								// Checking that the move is valid
 								if (moves.get(k).x == i && moves.get(k).y == j) {
-									board_logic.moveTo(current_selected,
-											new Point(i, j), context);
+									boolean result = board_logic.moveTo(
+											current_selected, new Point(i, j),
+											context);
+									if (result) {
+										if (playerTurn == Piece.PLAYER_BLACK) {
+											playerTurn = Piece.PLAYER_WHITE;
+										} else {
+											playerTurn = Piece.PLAYER_BLACK;
+										}
+										disabled_current_selected = true;
+									} else {
+										disabled_current_selected = false;
+									}
 									k = moves.size();
-									disabled_current_selected = false;
 									this.invalidate();
 								}
 							}
@@ -157,6 +168,8 @@ public class GBoard extends View {
 
 					i = Board.NUM_BOX_ROW + 1;
 					j = Board.NUM_BOX_ROW + 1;
+				} else {
+					disabled_current_selected = false;
 				}
 			}
 		}

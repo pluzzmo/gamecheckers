@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.graphics.Point;
-import android.widget.Toast;
 
 public class Board {
 	public static final int PLAYER_PIECES = 12;
@@ -57,9 +56,9 @@ public class Board {
 		}
 	}
 
-	public void moveTo(Piece piece, Point point, Context context) {
+	public boolean moveTo(Piece piece, Point point, Context context) {
 		ArrayList<Point> moves = piece.possibleMoves(board);
-
+		boolean result = false;
 		for (int i = 0; i < moves.size(); i++) {
 			if (moves.get(i).x == point.x && moves.get(i).y == point.y) {
 				board[point.x][point.y] = piece;
@@ -82,7 +81,10 @@ public class Board {
 				piece.x = point.x;
 				piece.y = point.y;
 				i = moves.size();
+				
+				result = true;
 			}
 		}
+		return result;
 	}
 }
