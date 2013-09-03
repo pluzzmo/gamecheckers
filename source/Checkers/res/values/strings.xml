@@ -10,8 +10,10 @@
     <string name="title_activity_main">MainActivity</string>
     <string name="title_activity_checkerboard">CheckerboardActivity</string>
     <string name="copyright">\u00A9 Copyright 2013</string>
-    <string name="player_1">IA Player 1</string>
-    <string name="player_2">IA Player 2</string>
+    <string name="player_ia_1">IA Player 1</string>
+    <string name="player_ia_2">IA Player 2</string>
+    <string name="player_1">Player 1</string>
+    <string name="player_2">Player 2</string>
     <string name="player">IA Player</string>
     <string name="player_men">Men Player</string>
 

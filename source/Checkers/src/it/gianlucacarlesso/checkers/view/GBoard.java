@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import it.gianlucacarlesso.checkers.R;
 import it.gianlucacarlesso.checkers.logic.Board;
+import it.gianlucacarlesso.checkers.logic.Engine;
 import it.gianlucacarlesso.checkers.logic.Piece;
 import it.gianlucacarlesso.checkers.utilities.DisplayProperties;
 import android.content.Context;
@@ -21,7 +22,7 @@ public class GBoard extends View {
 	private static Point SIZE_BOARD_ORIGIN = new Point(1319, 1406);
 	private static Point CENTER_BOARD_ORIGIN = new Point(649, 627);
 	private static Point SIZE_BOX_ORIGIN = new Point(140, 140);
-	private Board board_logic = new Board();
+	private Engine engine = new Engine();
 
 	private Context context;
 	private Bitmap board;
@@ -40,11 +41,8 @@ public class GBoard extends View {
 	private float shadow = 17;
 	private Point screen_size;
 	private PointF[][] matrix = new PointF[Board.NUM_BOX_ROW][Board.NUM_BOX_ROW];
-	private Piece current_selected = null;
 	private float correct = 0;
 	private ArrayList<Point> moves = null;
-	private int playerTurn = Piece.PLAYER_WHITE;
-	private Piece specialTurn = null;
 
 	float box_size_x;
 	float box_size_y;
@@ -86,6 +84,8 @@ public class GBoard extends View {
 		// Draw pieces
 		drawPieces(canvas, (int) correct, pos_x, pos_y);
 
+		Piece current_selected = engine.getCurrentSelected();
+		
 		if (current_selected != null) {
 			Bitmap image_piece = null;
 			if (Piece.PLAYER_BLACK == current_selected.player) {
@@ -111,9 +111,7 @@ public class GBoard extends View {
 					null);
 
 			// Retrieving all the possible moves of the pawn selected
-			moves = current_selected.possibleMoves(board_logic.getBoard(),
-					specialTurn != null && specialTurn.x == current_selected.x
-							&& specialTurn.y == current_selected.y);
+			moves = engine.getNextPossibleMoves();
 
 			// I visualize the images of possible moves depending on the
 			// player's turn
@@ -150,7 +148,6 @@ public class GBoard extends View {
 		float x = event.getX();
 		float y = event.getY();
 
-		boolean disabled_current_selected = true;
 		for (int i = 0; i < Board.NUM_BOX_ROW; i++) {
 			for (int j = 0; j < Board.NUM_BOX_ROW; j++) {
 				if (matrix[i][j].x <= x
@@ -160,79 +157,15 @@ public class GBoard extends View {
 						&& matrix[i][j].y <= y
 						&& matrix[i][j].y + box_size_y >= y) {
 
-					if (board_logic.board[i][j] != null) {
-						if (board_logic.board[i][j].player == playerTurn
-								|| (specialTurn != null
-										&& specialTurn.x == board_logic.board[i][j].x && specialTurn.y == board_logic.board[i][j].y)) {
-							current_selected = new Piece(i, j,
-									board_logic.board[i][j].player, board_logic.board[i][j].dama);
-							this.invalidate();
-							disabled_current_selected = false;
-						}
-					} else {
-						if (moves != null) {
-							// I run the player's move
-							for (int k = 0; k < moves.size(); k++) {
-								// Checking that the move is valid
-								if (moves.get(k).x == i && moves.get(k).y == j) {
-									Piece oldSpecialTurn = new Piece(
-											current_selected.x,
-											current_selected.y, current_selected.player, current_selected.dama);
-									int result = board_logic.moveTo(
-											current_selected, new Point(i, j),
-											context,
-											current_selected == specialTurn);
-
-									// If the player who moved is that of the
-									// current round: shift change, but if I ran
-									// a double move with the previous player
-									// does not shift change.
-									if (result != Board.NO_MOVE
-											&& (specialTurn == null || !(specialTurn != null
-													&& specialTurn.x == oldSpecialTurn.x && specialTurn.y == oldSpecialTurn.y))) {
-										if (playerTurn == Piece.PLAYER_BLACK) {
-											playerTurn = Piece.PLAYER_WHITE;
-										} else {
-											playerTurn = Piece.PLAYER_BLACK;
-										}
-										disabled_current_selected = true;
-									} else {
-										if (specialTurn != null
-												&& specialTurn.x == oldSpecialTurn.x
-												&& specialTurn.y == oldSpecialTurn.y) {
-											disabled_current_selected = true;
-										} else {
-											disabled_current_selected = false;
-										}
-									}
-
-									if (result == Board.PAWN_ELIMINATED
-											&& current_selected
-													.eatOpponentPawn(
-															board_logic
-																	.getBoard())
-													.size() > 0) {
-										specialTurn = current_selected;
-									} else {
-										specialTurn = null;
-									}
-
-									k = moves.size();
-									this.invalidate();
-								}
-							}
-						}
-					}
+						engine.executeAction(i, j, context);
+						this.invalidate();
 
 					i = Board.NUM_BOX_ROW + 1;
 					j = Board.NUM_BOX_ROW + 1;
 				} else {
-					disabled_current_selected = false;
+					// engine.disabledCurrentSelected();
 				}
 			}
-		}
-		if (disabled_current_selected == true) {
-			current_selected = null;
 		}
 		return false;
 	}
@@ -345,18 +278,19 @@ public class GBoard extends View {
 
 		// Walk the entire board and drawing their pawns
 		Bitmap image_piece = null;
+		Piece[][] board_logic = engine.getBoardLogic();
 		for (int i = 0; i < Board.NUM_BOX_ROW; i++) {
 			for (int j = 0; j < Board.NUM_BOX_ROW; j++) {
 				// Control in the current box there is a pawn
-				if (board_logic.board[i][j] != null) {
-					if (board_logic.board[i][j].player == Piece.PLAYER_BLACK) {
-						if (!board_logic.board[i][j].dama) {
+				if (board_logic[i][j] != null) {
+					if (board_logic[i][j].player == Piece.PLAYER_BLACK) {
+						if (!board_logic[i][j].dama) {
 							image_piece = piece_black;
 						} else {
 							image_piece = piece_black_dama;
 						}
 					} else {
-						if (!board_logic.board[i][j].dama) {
+						if (!board_logic[i][j].dama) {
 							image_piece = piece_white;
 						} else {
 							image_piece = piece_white_dama;

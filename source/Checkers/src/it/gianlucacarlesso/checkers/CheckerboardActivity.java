@@ -53,12 +53,16 @@ public class CheckerboardActivity extends Activity {
 				"fonts/curse_casual.ttf");
 		if (getIntent().getIntExtra(CheckerboardActivity.GAME_MODE, 0) == 0) {
 			// IA vs IA game mode
-			player1.setText(R.string.player_1);
-			player2.setText(R.string.player_2);
-		} else {
+			player1.setText(R.string.player_ia_1);
+			player2.setText(R.string.player_ia_2);
+		} else if (getIntent().getIntExtra(CheckerboardActivity.GAME_MODE, 0) == 1) {
 			// Man vs IA game mode
 			player1.setText(R.string.player);
 			player2.setText(R.string.player_men);
+		} else {
+			// Man vs Man game mode
+			player1.setText(R.string.player_1);
+			player2.setText(R.string.player_1);
 		}
 
 		player1.setTypeface(typface);
