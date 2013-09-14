@@ -63,9 +63,9 @@ public class CheckersActivity extends Activity {
 		title.setTypeface(typface);
 
 		// TODO REMOVE
-		Intent intent = new Intent(this, CheckerboardActivity.class);
-		intent.putExtra(CheckerboardActivity.GAME_MODE, 0);
-		startActivity(intent);
+//		Intent intent = new Intent(this, CheckerboardActivity.class);
+//		intent.putExtra(CheckerboardActivity.GAME_MODE, 0);
+//		startActivity(intent);
 	}
 
 	public void startCheckerBoard(View view) {

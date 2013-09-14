@@ -22,7 +22,7 @@ public class GBoard extends View {
 	private static Point SIZE_BOARD_ORIGIN = new Point(1319, 1406);
 	private static Point CENTER_BOARD_ORIGIN = new Point(649, 627);
 	private static Point SIZE_BOX_ORIGIN = new Point(140, 140);
-	private Engine engine = new Engine();
+	private Engine engine = null;
 
 	private Context context;
 	private Bitmap board;
@@ -85,7 +85,7 @@ public class GBoard extends View {
 		drawPieces(canvas, (int) correct, pos_x, pos_y);
 
 		Piece current_selected = engine.getCurrentSelected();
-		
+
 		if (current_selected != null) {
 			Bitmap image_piece = null;
 			if (Piece.PLAYER_BLACK == current_selected.player) {
@@ -148,6 +148,7 @@ public class GBoard extends View {
 		float x = event.getX();
 		float y = event.getY();
 
+		boolean correctAction = false;
 		for (int i = 0; i < Board.NUM_BOX_ROW; i++) {
 			for (int j = 0; j < Board.NUM_BOX_ROW; j++) {
 				if (matrix[i][j].x <= x
@@ -157,16 +158,27 @@ public class GBoard extends View {
 						&& matrix[i][j].y <= y
 						&& matrix[i][j].y + box_size_y >= y) {
 
-						engine.executeAction(i, j, context);
-						this.invalidate();
+					correctAction = engine.executeAction(i, j);
+					this.invalidate();
 
 					i = Board.NUM_BOX_ROW + 1;
 					j = Board.NUM_BOX_ROW + 1;
-				} else {
-					// engine.disabledCurrentSelected();
 				}
 			}
 		}
+
+		if (correctAction
+				&& engine.getGameMode() != Engine.GAME_MODE_MAN_VS_MAN
+				&& (engine.getPlayerTurn() == Piece.PLAYER_BLACK || engine
+						.getGameMode() == Engine.GAME_MODE_IA_VS_IA)) {
+			// I perform the move of artificial intelligence. This always occurs
+			// when I perform the mode ia ia vs, or in the case of ia vs man is
+			// when the player's turn black
+			this.invalidate();
+			engine.moveIA();
+			this.invalidate();
+		}
+
 		return false;
 	}
 
@@ -305,6 +317,16 @@ public class GBoard extends View {
 											.getHeight()) / 2.0)), null);
 				}
 			}
+		}
+	}
+
+	public void setGameMode(int gameMode) {
+		if (gameMode == Engine.GAME_MODE_IA_VS_IA) {
+			engine = new Engine(gameMode);
+		} else if (gameMode == Engine.GAME_MODE_IA_VS_MAN) {
+			engine = new Engine(gameMode);
+		} else {
+			engine = new Engine(gameMode);
 		}
 	}
 }

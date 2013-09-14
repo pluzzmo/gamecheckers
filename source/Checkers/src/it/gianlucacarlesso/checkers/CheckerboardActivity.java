@@ -2,6 +2,7 @@ package it.gianlucacarlesso.checkers;
 
 import it.gianlucacarlesso.checkers.utilities.DisplayProperties;
 import it.gianlucacarlesso.checkers.utilities.ImageUtilities;
+import it.gianlucacarlesso.checkers.view.GBoard;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -22,7 +23,18 @@ public class CheckerboardActivity extends Activity {
 	@SuppressLint("NewApi")
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_checkerboard);
+		int layout_id = 0;
+		if (getIntent().getIntExtra(CheckerboardActivity.GAME_MODE, 0) == 0) {
+			// IA vs IA game mode
+			layout_id = R.layout.activity_checkerboard_ia_vs_ia;
+		} else if (getIntent().getIntExtra(CheckerboardActivity.GAME_MODE, 0) == 1) {
+			// Man vs IA game mode
+			layout_id = R.layout.activity_checkerboard_man_vs_ia;
+		} else {
+			// Man vs Man game mode
+			layout_id = R.layout.activity_checkerboard_man_vs_man;
+		}
+		setContentView(layout_id);
 
 		// Set and rescale background
 		View layout = getWindow().getDecorView().findViewById(
@@ -51,22 +63,13 @@ public class CheckerboardActivity extends Activity {
 
 		typface = Typeface.createFromAsset(getAssets(),
 				"fonts/curse_casual.ttf");
-		if (getIntent().getIntExtra(CheckerboardActivity.GAME_MODE, 0) == 0) {
-			// IA vs IA game mode
-			player1.setText(R.string.player_ia_1);
-			player2.setText(R.string.player_ia_2);
-		} else if (getIntent().getIntExtra(CheckerboardActivity.GAME_MODE, 0) == 1) {
-			// Man vs IA game mode
-			player1.setText(R.string.player);
-			player2.setText(R.string.player_men);
-		} else {
-			// Man vs Man game mode
-			player1.setText(R.string.player_1);
-			player2.setText(R.string.player_1);
-		}
-
 		player1.setTypeface(typface);
 		player2.setTypeface(typface);
+		
+		// Imposed on the game mode Damiera
+		GBoard gboard = (GBoard) findViewById(R.id.board);
+		gboard.setGameMode(getIntent().getIntExtra(CheckerboardActivity.GAME_MODE, 0));
+
 	}
 
 }

@@ -2,7 +2,6 @@ package it.gianlucacarlesso.checkers.logic;
 
 import java.util.ArrayList;
 
-import android.content.Context;
 import android.graphics.Point;
 
 public class Board {
@@ -59,8 +58,7 @@ public class Board {
 		}
 	}
 
-	public int moveTo(Piece piece, Point point, Context context,
-			boolean isSpecialTurn) {
+	public int moveTo(Piece piece, Point point, boolean isSpecialTurn) {
 		ArrayList<Point> moves = piece.possibleMoves(board, isSpecialTurn);
 		int result = NO_MOVE;
 		for (int i = 0; i < moves.size(); i++) {
