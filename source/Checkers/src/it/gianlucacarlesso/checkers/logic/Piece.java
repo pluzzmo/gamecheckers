@@ -140,4 +140,9 @@ public class Piece {
 			}
 		}
 	}
+	
+	@Override
+	public Piece clone(){
+		return new Piece(x, y, player, dama);
+	}
 }
