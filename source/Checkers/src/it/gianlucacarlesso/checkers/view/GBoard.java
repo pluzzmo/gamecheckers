@@ -6,6 +6,7 @@ import it.gianlucacarlesso.checkers.R;
 import it.gianlucacarlesso.checkers.logic.Board;
 import it.gianlucacarlesso.checkers.logic.Engine;
 import it.gianlucacarlesso.checkers.logic.Piece;
+import it.gianlucacarlesso.checkers.logic.Player;
 import it.gianlucacarlesso.checkers.utilities.DisplayProperties;
 import android.content.Context;
 import android.content.res.Resources;
@@ -88,13 +89,13 @@ public class GBoard extends View {
 
 		if (current_selected != null) {
 			Bitmap image_piece = null;
-			if (Piece.PLAYER_BLACK == current_selected.player) {
+			if (Player.PLAYER_BLACK == current_selected.player) {
 				if (!current_selected.dama) {
 					image_piece = piece_black_selected;
 				} else {
 					image_piece = piece_black_selected_dama;
 				}
-			} else if (Piece.PLAYER_WHITE == current_selected.player) {
+			} else if (Player.PLAYER_WHITE == current_selected.player) {
 				if (!current_selected.dama) {
 					image_piece = piece_white_selected;
 				} else {
@@ -116,13 +117,13 @@ public class GBoard extends View {
 			// I visualize the images of possible moves depending on the
 			// player's turn
 			Bitmap possible_image = null;
-			if (current_selected.player == Piece.PLAYER_BLACK) {
+			if (current_selected.player == Player.PLAYER_BLACK) {
 				if (!current_selected.dama) {
 					possible_image = piece_black_possible;
 				} else {
 					possible_image = piece_black_possible_dama;
 				}
-			} else if (current_selected.player == Piece.PLAYER_WHITE) {
+			} else if (current_selected.player == Player.PLAYER_WHITE) {
 				if (!current_selected.dama) {
 					possible_image = piece_white_possible;
 				} else {
@@ -158,7 +159,8 @@ public class GBoard extends View {
 						&& matrix[i][j].y <= y
 						&& matrix[i][j].y + box_size_y >= y) {
 
-					correctAction = engine.executeAction(i, j);
+					// Communicate the logical part of the selected box
+					correctAction = engine.estimateBox(new Point(i, j));
 					this.invalidate();
 
 					i = Board.NUM_BOX_ROW + 1;
@@ -169,7 +171,7 @@ public class GBoard extends View {
 
 		if (correctAction
 				&& engine.getGameMode() != Engine.GAME_MODE_MAN_VS_MAN
-				&& (engine.getPlayerTurn() == Piece.PLAYER_BLACK || engine
+				&& (engine.getPlayerTurn() == Player.PLAYER_BLACK || engine
 						.getGameMode() == Engine.GAME_MODE_IA_VS_IA)) {
 			// I perform the move of artificial intelligence. This always occurs
 			// when I perform the mode ia ia vs, or in the case of ia vs man is
@@ -295,7 +297,7 @@ public class GBoard extends View {
 			for (int j = 0; j < Board.NUM_BOX_ROW; j++) {
 				// Control in the current box there is a pawn
 				if (board_logic[i][j] != null) {
-					if (board_logic[i][j].player == Piece.PLAYER_BLACK) {
+					if (board_logic[i][j].player == Player.PLAYER_BLACK) {
 						if (!board_logic[i][j].dama) {
 							image_piece = piece_black;
 						} else {

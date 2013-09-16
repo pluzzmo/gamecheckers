@@ -5,9 +5,6 @@ import java.util.ArrayList;
 import android.graphics.Point;
 
 public class Piece {
-	public static int PLAYER_BLACK = 0;
-	public static int PLAYER_WHITE = 1;
-
 	public int x;
 	public int y;
 	public int player;
@@ -36,7 +33,7 @@ public class Piece {
 		ArrayList<Point> moves = new ArrayList<Point>();
 		// Control the direction of movement of the counter
 		int direction = 1;
-		if (player == PLAYER_WHITE) {
+		if (player == Player.PLAYER_WHITE) {
 			direction = -1;
 		}
 
@@ -60,7 +57,7 @@ public class Piece {
 		ArrayList<Point> moves = new ArrayList<Point>();
 		// Control the direction of movement of the counter
 		int direction = 1;
-		if (player == PLAYER_WHITE) {
+		if (player == Player.PLAYER_WHITE) {
 			direction = -1;
 		}
 
@@ -139,10 +136,5 @@ public class Piece {
 				}
 			}
 		}
-	}
-	
-	@Override
-	public Piece clone(){
-		return new Piece(x, y, player, dama);
 	}
 }
