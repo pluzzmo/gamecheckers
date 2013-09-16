@@ -103,16 +103,28 @@ public class Board {
 	public Board clone() {
 		Board newItem = new Board();
 		for (int i = 0; i < newItem.player_black.length; i++) {
-			newItem.player_black[i] = player_black[i].clone();
+			if (player_black[i] != null) {
+				newItem.player_black[i] = player_black[i].clone();
+			} else {
+				newItem.player_black[i] = null;
+			}
 		}
 
 		for (int i = 0; i < newItem.player_white.length; i++) {
-			newItem.player_white[i] = player_white[i].clone();
+			if (player_white != null) {
+				newItem.player_white[i] = player_white[i].clone();
+			} else {
+				newItem.player_white[i] = null;
+			}
 		}
 
 		for (int i = 0; i < newItem.board.length; i++) {
 			for (int j = 0; j < newItem.board.length; j++) {
-				newItem.board[i][j] = board[i][j].clone();
+				if (board[i][j] != null) {
+					newItem.board[i][j] = board[i][j].clone();
+				} else {
+					newItem.board[i][j] = null;
+				}
 			}
 		}
 

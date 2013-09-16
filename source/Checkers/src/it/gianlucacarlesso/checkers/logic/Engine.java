@@ -1,7 +1,9 @@
 package it.gianlucacarlesso.checkers.logic;
 
 import java.util.ArrayList;
+
 import android.graphics.Point;
+import android.util.Log;
 
 public class Engine {
 	public static int GAME_MODE_IA_VS_IA = 0;
@@ -99,89 +101,171 @@ public class Engine {
 		return isMoved;
 	}
 
-	public Point moveIA(int current_deep, Piece cur) {
+	private Move moveIA(int current_deep) {
 		int maxValue = -1000;
 		int currentValue = -1000;
-		Point bestPoint = null;
+		Move move = null;
 
 		if (current_deep < DEEP_SEARCH) {
 			Piece[][] board = board_logic.getBoard();
 			ArrayList<Point> moves = null;
 
 			// Save the current state
-			Board board_logic_tmp = board_logic;
-			Piece specialTurn_tmp = specialTurn;
+			Board board_logic_tmp = null;
+			if (board_logic != null) {
+				board_logic_tmp = board_logic.clone();
+			}
+
+			Piece specialTurn_tmp = null;
+			if (specialTurn != null) {
+				specialTurn_tmp = specialTurn.clone();
+			}
+
 			int playerTurn_tmp = playerTurn;
-			Piece current_selected_tmp = current_selected;
+
+			Piece current_selected_tmp = null;
+			if (current_selected != null) {
+				current_selected_tmp = current_selected.clone();
+			}
 
 			for (int i = 0; i < board.length; i++) {
 				for (int j = 0; j < board.length; j++) {
 					if (board[i][j] != null && board[i][j].player == playerTurn) {
-						current_selected = new Piece(board[i][j].x, board[i][j].y, board[i][j].player, board[i][j].dama);
+						current_selected = new Piece(board[i][j].x,
+								board[i][j].y, board[i][j].player,
+								board[i][j].dama);
+						Piece current_selected_tmp1 = current_selected.clone();
 						moves = getNextPossibleMoves();
 						for (int k = 0; k < moves.size(); k++) {
 							executeAction(moves.get(k).x, moves.get(k).y);
-//							moveIA(current_deep + 1, cur);
+							// moveIA(current_deep + 1, cur);
 							currentValue = valueCurrentBoard();
-							
+							if (currentValue > maxValue) {
+								int x = 1;
 								maxValue = currentValue;
-								bestPoint = moves.get(k);
-								cur = current_selected;
-							
-								
-								board_logic = board_logic_tmp;
-								specialTurn = specialTurn_tmp;
-								playerTurn = playerTurn_tmp;
-								current_selected = current_selected_tmp;
+								move = new Move(moves.get(k),
+										current_selected_tmp1.clone());
+							}
+
+							// Restore correct state
+							board_logic = null;
+							if (board_logic_tmp != null) {
+								board_logic = board_logic_tmp.clone();
+							}
+
+							specialTurn = null;
+							if (specialTurn_tmp != null) {
+								specialTurn = specialTurn_tmp.clone();
+							}
+
+							playerTurn = playerTurn_tmp;
+
+							current_selected = null;
+							if (current_selected_tmp1 != null) {
+								current_selected = current_selected_tmp1
+										.clone();
+							}
+
 						}
-						board_logic = board_logic_tmp;
-						specialTurn = specialTurn_tmp;
+						// Restore correct state
+						board_logic = null;
+						if (board_logic_tmp != null) {
+							board_logic = board_logic_tmp.clone();
+						}
+
+						specialTurn = null;
+						if (specialTurn_tmp != null) {
+							specialTurn = specialTurn_tmp.clone();
+						}
+
 						playerTurn = playerTurn_tmp;
-						current_selected = current_selected_tmp;
+
+						current_selected = null;
+						if (current_selected_tmp1 != null) {
+							current_selected = current_selected_tmp1.clone();
+						}
 					}
 				}
 			}
 
 			// Restore correct state
-			board_logic = board_logic_tmp;
-			specialTurn = specialTurn_tmp;
+			board_logic = null;
+			if (board_logic_tmp != null) {
+				board_logic = board_logic_tmp.clone();
+			}
+
+			specialTurn = null;
+			if (specialTurn_tmp != null) {
+				specialTurn = specialTurn_tmp.clone();
+			}
+
 			playerTurn = playerTurn_tmp;
-			current_selected = current_selected_tmp;
+
+			current_selected = null;
+			if (current_selected_tmp != null) {
+				current_selected = current_selected_tmp.clone();
+			}
+
 		}
 
-		return bestPoint;
+		return move;
 	}
 
 	public void moveIA() {
 		// Save the current state
-		Board board_logic_tmp = board_logic;
-		Piece specialTurn_tmp = specialTurn;
-		int playerTurn_tmp = playerTurn;
-		Piece current_selected_tmp = current_selected;
+		Board board_logic_tmp = null;
+		if (board_logic != null) {
+			board_logic_tmp = board_logic.clone();
+		}
 
-		Piece cur = new Piece(0, 0);
-		Point point = moveIA(0, cur);
-		
+		Piece specialTurn_tmp = null;
+		if (specialTurn != null) {
+			specialTurn_tmp = specialTurn.clone();
+		}
+
+		int playerTurn_tmp = playerTurn;
+
+		Piece current_selected_tmp = null;
+		if (current_selected != null) {
+			current_selected_tmp = current_selected.clone();
+		}
+
+		Move move = moveIA(0);
+
 		// Restore correct state
-		board_logic = board_logic_tmp;
-		specialTurn = specialTurn_tmp;
+		board_logic = null;
+		if (board_logic_tmp != null) {
+			board_logic = board_logic_tmp.clone();
+		}
+
+		specialTurn = null;
+		if (specialTurn_tmp != null) {
+			specialTurn = specialTurn_tmp.clone();
+		}
+
 		playerTurn = playerTurn_tmp;
-		current_selected = current_selected_tmp;
-		
-		executeAction(point.x, point.y);
+
+		current_selected = null;
+		if (current_selected_tmp != null) {
+			current_selected = current_selected_tmp.clone();
+		}
+
+		current_selected = move.piece;
+
+		executeAction(move.point.x, move.point.y);
 	}
 
 	private int valueCurrentBoard() {
 		Piece[][] board = board_logic.getBoard();
-		
+
 		int sizeBlack = 0;
 		int sizeWhite = 0;
-		
+
 		for (int i = 0; i < board.length; i++) {
 			for (int j = 0; j < board.length; j++) {
-				if(board[i][j]!= null) {
-					if(board[i][j].player == Piece.PLAYER_BLACK) {
-					sizeBlack++;
+				if (board[i][j] != null) {
+					if (board[i][j].player == Piece.PLAYER_BLACK) {
+						sizeBlack++;
 					} else {
 						sizeWhite++;
 					}
@@ -210,5 +294,15 @@ public class Engine {
 
 	public int getPlayerTurn() {
 		return playerTurn;
+	}
+
+	private class Move {
+		public Point point;
+		public Piece piece;
+
+		public Move(Point _point, Piece _piece) {
+			point = _point;
+			piece = _piece.clone();
+		}
 	}
 }
