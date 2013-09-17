@@ -67,7 +67,8 @@ public class Engine {
 			if (board_logic.board[point.x][point.y].player == playerTurn) {
 				// I selected a new box from where to make my move
 				current_selected = board_logic.board[point.x][point.y];
-			} else if(specialTurn != null && specialTurn.x == point.x && specialTurn.y == point.y) {
+			} else if (specialTurn != null && specialTurn.x == point.x
+					&& specialTurn.y == point.y) {
 				current_selected = board_logic.board[point.x][point.y];
 			} else {
 				current_selected = null;
@@ -75,9 +76,11 @@ public class Engine {
 			result = false;
 		} else if (current_selected != null
 				&& board_logic.board[point.x][point.y] == null) {
-			if(specialTurn != null && specialTurn.player == current_selected.player) {
-				// if they are in a special round, I have to reverse the variable that handles the turn
-				if(playerTurn == Player.PLAYER_BLACK) {
+			if (specialTurn != null
+					&& specialTurn.player == current_selected.player) {
+				// if they are in a special round, I have to reverse the
+				// variable that handles the turn
+				if (playerTurn == Player.PLAYER_BLACK) {
 					playerTurn = Player.PLAYER_WHITE;
 				} else {
 					playerTurn = Player.PLAYER_BLACK;
@@ -118,7 +121,10 @@ public class Engine {
 					int result = board_logic.moveTo(player, playerOpposing,
 							new Point(move.pointFrom.x, move.pointFrom.y),
 							new Point(move.pointTo.x, move.pointTo.y),
-							playerTurn, specialTurn != null && current_selected.x == specialTurn.x && current_selected.y == specialTurn.y, specialTurn);
+							playerTurn, specialTurn != null
+									&& current_selected.x == specialTurn.x
+									&& current_selected.y == specialTurn.y,
+							specialTurn);
 
 					// If the player who moved is that of the
 					// current round: shift change, but if I ran
@@ -186,33 +192,36 @@ public class Engine {
 				playerOpposing = playerBlack;
 			}
 
+			int oldPlayerTurn = playerTurn;
 			for (int i = 0; i < player.pieces.size(); i++) {
-				Piece current_selectedOld = new Piece(current_selected.x,
-						current_selected.y, current_selected.player,
-						current_selected.dama);
 				current_selected = player.pieces.get(i);
+				Piece oldCurrentSelected = current_selected;
+				int currentPlayerTurn = oldPlayerTurn;
 				moves = getNextPossibleMoves();
 
 				for (int k = 0; k < moves.size(); k++) {
 					oldValue = valueCurrentBoard(playerTurn);
-					executeAction(new Move(new Point(current_selected.x,
-							current_selected.y), moves.get(k)));
+					Move moveTmp = new Move(new Point(current_selected.x,
+							current_selected.y), moves.get(k));
+					executeAction(moveTmp);
+					playerTurn = oldPlayerTurn;
 					warehouse.add(player.moves.peek());
 					// moveIA(current_deep + 1, cur);
 					newValue = valueCurrentBoard(playerTurn);
-					if (newValue > oldValue && newValue > maxValue) {
+					if (newValue >= oldValue && newValue > maxValue) {
 						maxValue = newValue;
-						move = new Move(new Point(current_selected.x,
-								current_selected.y), moves.get(k));
+						move = new Move(new Point(
+								player.moves.peek().pointFrom.x,
+								player.moves.peek().pointFrom.y), moves.get(k));
 					}
 
-					// restore
-					current_selected = new Piece(current_selectedOld.x,
-							current_selectedOld.y, current_selectedOld.player,
-							current_selectedOld.dama);
+					revert(warehouse);
+					playerTurn = currentPlayerTurn;
+					current_selected = oldCurrentSelected;
 				}
 
 			}
+			playerTurn = oldPlayerTurn;
 		}
 
 		return move;
@@ -222,6 +231,7 @@ public class Engine {
 		Move move = moveIA(0);
 		// current_selected = move.piece;
 
+		current_selected = board_logic.board[move.pointFrom.x][move.pointFrom.y];
 		executeAction(move);
 	}
 
@@ -256,5 +266,43 @@ public class Engine {
 
 	public int getPlayerTurn() {
 		return playerTurn;
+	}
+
+	public void revert(Stack<Move> moves) {
+		Move move = null;
+
+		for (int i = 0; i < moves.size(); i++) {
+			move = moves.pop();
+
+			playerTurn = board_logic.board[move.pointTo.x][move.pointTo.y].player;
+
+			Player player = null;
+			Player playerOpposing = null;
+			if (Player.PLAYER_BLACK == playerTurn) {
+				player = playerBlack;
+				playerOpposing = playerWhite;
+			} else {
+				player = playerWhite;
+				playerOpposing = playerBlack;
+			}
+
+			boolean isDama = false;
+			if(move.isDama) {
+				isDama = true;
+			}
+			player.moveTo(move.pointTo, move.pointFrom, isDama, null);
+			if (move.pawnDeleted != null) {
+				playerOpposing.pieces.add(move.pawnDeleted);
+			}
+
+			if (player.moves.size() > 0) {
+				player.moves.pop();
+				if (player.moves.size() > 0) {
+					player.moves.pop();
+				}
+			}
+
+			boardPlayersSync();
+		}
 	}
 }

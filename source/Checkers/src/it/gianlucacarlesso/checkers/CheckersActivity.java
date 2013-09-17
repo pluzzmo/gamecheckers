@@ -64,7 +64,7 @@ public class CheckersActivity extends Activity {
 
 		// TODO REMOVE
 		Intent intent = new Intent(this, CheckerboardActivity.class);
-		intent.putExtra(CheckerboardActivity.GAME_MODE, 2);
+		intent.putExtra(CheckerboardActivity.GAME_MODE, 1);
 		startActivity(intent);
 	}
 

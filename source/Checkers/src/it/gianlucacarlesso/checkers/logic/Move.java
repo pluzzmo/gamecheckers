@@ -22,4 +22,5 @@ public class Move {
 		pawnDeleted = _pawnDeleted;
 		isDama = _isDama;
 	}
+	
 }

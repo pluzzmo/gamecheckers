@@ -25,6 +25,9 @@ public class Board {
 		} else {
 			piece = specialTurn;
 		}
+		int x = 0;
+		if(piece== null)
+			x = 1;
 		moves = piece.possibleMoves(board, isSpecialTurn);
 
 		int result = NO_MOVE;
