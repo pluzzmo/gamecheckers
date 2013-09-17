@@ -72,7 +72,7 @@ public class Piece {
 				&& board[current.x + 1 * direction][current.y - 1] != null
 				&& board[current.x + 1 * direction][current.y - 1].player != player) {
 			// A pawn can not eat a Dama
-			if (!(!dama && board[current.x + 1 * direction][y - 1].dama)) {
+			if (!(!dama && board[current.x + 1 * direction][current.y - 1].dama)) {
 				ArrayList<Move> sequenceBuild = new ArrayList<Move>();
 				for(int i = 0; i<sequence.size();i++) {
 					sequenceBuild.add(sequence.get(i));

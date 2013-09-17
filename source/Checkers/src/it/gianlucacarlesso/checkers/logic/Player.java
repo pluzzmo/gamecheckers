@@ -98,7 +98,9 @@ public class Player {
 				if (pieces.get(j).x == from.x && pieces.get(j).y == from.y) {
 					pieces.get(j).x = to.x;
 					pieces.get(j).y = to.y;
-					pieces.get(j).dama = isDama;
+					if (pieces.get(j).dama == false && isDama == true) {
+						pieces.get(j).dama = isDama;
+					}
 				}
 			}
 
