@@ -3,8 +3,8 @@ package it.gianlucacarlesso.checkers.view;
 import java.util.ArrayList;
 
 import it.gianlucacarlesso.checkers.R;
-import it.gianlucacarlesso.checkers.logic.Board;
 import it.gianlucacarlesso.checkers.logic.Engine;
+import it.gianlucacarlesso.checkers.logic.Move;
 import it.gianlucacarlesso.checkers.logic.Piece;
 import it.gianlucacarlesso.checkers.logic.Player;
 import it.gianlucacarlesso.checkers.utilities.DisplayProperties;
@@ -41,9 +41,9 @@ public class GBoard extends View {
 	private Bitmap piece_white_possible_dama;
 	private float shadow = 17;
 	private Point screen_size;
-	private PointF[][] matrix = new PointF[Board.NUM_BOX_ROW][Board.NUM_BOX_ROW];
+	private PointF[][] matrix = new PointF[Engine.NUM_BOX_ROW][Engine.NUM_BOX_ROW];
 	private float correct = 0;
-	private ArrayList<Point> moves = null;
+	private ArrayList<ArrayList<Move>> moves = null;
 
 	float box_size_x;
 	float box_size_y;
@@ -132,13 +132,16 @@ public class GBoard extends View {
 			}
 
 			for (int i = 0; i < moves.size(); i++) {
-				canvas.drawBitmap(
-						possible_image,
-						(float) ((float) matrix[moves.get(i).x][moves.get(i).y].x
-								+ (pos_x / 2.0) + correct),
-						(float) matrix[moves.get(i).x][moves.get(i).y].y
-								+ (float) ((box_size_y - image_piece
-										.getHeight()) / 2.0), null);
+				ArrayList<Move> sequence = moves.get(i);
+				for (int j = 0; j < sequence.size(); j++) {
+					canvas.drawBitmap(
+							possible_image,
+							(float) ((float) matrix[sequence.get(j).pointTo.x][sequence
+									.get(j).pointTo.y].x + (pos_x / 2.0) + correct),
+							(float) matrix[sequence.get(j).pointTo.x][sequence.get(j).pointTo.y].y
+									+ (float) ((box_size_y - image_piece
+											.getHeight()) / 2.0), null);
+				}
 			}
 		}
 	}
@@ -150,8 +153,8 @@ public class GBoard extends View {
 		float y = event.getY();
 
 		boolean correctAction = false;
-		for (int i = 0; i < Board.NUM_BOX_ROW; i++) {
-			for (int j = 0; j < Board.NUM_BOX_ROW; j++) {
+		for (int i = 0; i < Engine.NUM_BOX_ROW; i++) {
+			for (int j = 0; j < Engine.NUM_BOX_ROW; j++) {
 				if (matrix[i][j].x <= x
 						&& matrix[i][j].x + box_size_x >= x
 						// Individual touched the box and if present a pawn
@@ -163,8 +166,8 @@ public class GBoard extends View {
 					correctAction = engine.estimateBox(new Point(i, j));
 					this.invalidate();
 
-					i = Board.NUM_BOX_ROW + 1;
-					j = Board.NUM_BOX_ROW + 1;
+					i = Engine.NUM_BOX_ROW + 1;
+					j = Engine.NUM_BOX_ROW + 1;
 				}
 			}
 		}
@@ -176,10 +179,9 @@ public class GBoard extends View {
 			// I perform the move of artificial intelligence. This always occurs
 			// when I perform the mode ia ia vs, or in the case of ia vs man is
 			// when the player's turn black
-			this.invalidate();
 			engine.moveIA();
-			this.invalidate();
 		}
+		this.invalidate();
 
 		return false;
 	}
@@ -238,7 +240,7 @@ public class GBoard extends View {
 		piece_white_possible_dama = BitmapFactory.decodeResource(res,
 				R.drawable.piece_white_horizontal_possible_dama);
 
-		float new_x_piece = (int) (board.getWidth() / (Board.NUM_BOX_ROW + 1.3));
+		float new_x_piece = (int) (board.getWidth() / (Engine.NUM_BOX_ROW + 1.3));
 		if (new_x_piece >= box_size_x) {
 			new_x_piece = box_size_x - 5;
 		}
@@ -275,14 +277,14 @@ public class GBoard extends View {
 				(int) new_y_piece, false);
 
 		// Calculating all the boxes of Damiera
-		float xbox = board_center_x - box_size_x * Board.NUM_BOX_ROW / 2;
-		float ybox = board_center_y - box_size_y * Board.NUM_BOX_ROW / 2;
-		for (int i = 0; i < Board.NUM_BOX_ROW; i++) {
-			for (int j = 0; j < Board.NUM_BOX_ROW; j++) {
+		float xbox = board_center_x - box_size_x * Engine.NUM_BOX_ROW / 2;
+		float ybox = board_center_y - box_size_y * Engine.NUM_BOX_ROW / 2;
+		for (int i = 0; i < Engine.NUM_BOX_ROW; i++) {
+			for (int j = 0; j < Engine.NUM_BOX_ROW; j++) {
 				matrix[i][j] = new PointF(xbox, ybox);
 				xbox += box_size_x;
 			}
-			xbox = board_center_x - box_size_x * Board.NUM_BOX_ROW / 2;
+			xbox = board_center_x - box_size_x * Engine.NUM_BOX_ROW / 2;
 			ybox += box_size_y;
 		}
 	}
@@ -293,8 +295,8 @@ public class GBoard extends View {
 		// Walk the entire board and drawing their pawns
 		Bitmap image_piece = null;
 		Piece[][] board_logic = engine.getBoardLogic();
-		for (int i = 0; i < Board.NUM_BOX_ROW; i++) {
-			for (int j = 0; j < Board.NUM_BOX_ROW; j++) {
+		for (int i = 0; i < Engine.NUM_BOX_ROW; i++) {
+			for (int j = 0; j < Engine.NUM_BOX_ROW; j++) {
 				// Control in the current box there is a pawn
 				if (board_logic[i][j] != null) {
 					if (board_logic[i][j].player == Player.PLAYER_BLACK) {

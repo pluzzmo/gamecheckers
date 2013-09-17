@@ -33,7 +33,7 @@ public class Strategy {
 				} else {
 					values = values
 							+ 1
-							* (engine.board_logic.board.length - player.pieces
+							* (engine.board.length - player.pieces
 									.get(i).x);
 				}
 			}

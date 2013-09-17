@@ -8,13 +8,6 @@ public class Move {
 	public Piece pawnDeleted;
 	public boolean isDama;
 
-	public Move(Point _pointFrom, Point _pointTo) {
-		pointFrom = _pointFrom;
-		pointTo = _pointTo;
-		pawnDeleted = null;
-		isDama = false;
-	}
-
 	public Move(Point _pointFrom, Point _pointTo, boolean _isDama,
 			Piece _pawnDeleted) {
 		pointFrom = _pointFrom;
