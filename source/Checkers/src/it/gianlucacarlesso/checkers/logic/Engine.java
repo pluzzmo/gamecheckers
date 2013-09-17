@@ -67,12 +67,22 @@ public class Engine {
 			if (board_logic.board[point.x][point.y].player == playerTurn) {
 				// I selected a new box from where to make my move
 				current_selected = board_logic.board[point.x][point.y];
+			} else if(specialTurn != null && specialTurn.x == point.x && specialTurn.y == point.y) {
+				current_selected = board_logic.board[point.x][point.y];
 			} else {
 				current_selected = null;
 			}
 			result = false;
 		} else if (current_selected != null
 				&& board_logic.board[point.x][point.y] == null) {
+			if(specialTurn != null && specialTurn.player == current_selected.player) {
+				// if they are in a special round, I have to reverse the variable that handles the turn
+				if(playerTurn == Player.PLAYER_BLACK) {
+					playerTurn = Player.PLAYER_WHITE;
+				} else {
+					playerTurn = Player.PLAYER_BLACK;
+				}
+			}
 			result = executeAction(new Move(new Point(current_selected.x,
 					current_selected.y), point));
 		}
@@ -108,7 +118,7 @@ public class Engine {
 					int result = board_logic.moveTo(player, playerOpposing,
 							new Point(move.pointFrom.x, move.pointFrom.y),
 							new Point(move.pointTo.x, move.pointTo.y),
-							playerTurn, current_selected == specialTurn);
+							playerTurn, specialTurn != null && current_selected.x == specialTurn.x && current_selected.y == specialTurn.y, specialTurn);
 
 					// If the player who moved is that of the
 					// current round: shift change, but if I ran
@@ -134,6 +144,7 @@ public class Engine {
 						}
 					}
 
+					boardPlayersSync();
 					if (result == Board.PAWN_ELIMINATED
 							&& current_selected.eatOpponentPawn(
 									board_logic.getBoard()).size() > 0) {
@@ -162,7 +173,6 @@ public class Engine {
 		Move move = null;
 
 		if (current_deep < DEEP_SEARCH) {
-			Piece[][] board = board_logic.getBoard();
 			ArrayList<Point> moves = null;
 			Stack<Move> warehouse = new Stack<Move>();
 
