@@ -154,9 +154,8 @@ public class GBoard extends View {
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		if (engine.getGameMode() != Engine.GAME_MODE_MAN_VS_MAN
-				&& (engine.getPlayerTurn() != Player.PLAYER_BLACK || engine
-						.getGameMode() == Engine.GAME_MODE_IA_VS_IA)) {
+		if (engine.getGameMode() == Engine.GAME_MODE_MAN_VS_MAN
+				|| (engine.getPlayerTurn() != Player.PLAYER_BLACK)) {
 			// Recovering the coordinates of the touch
 			float x = event.getX();
 			float y = event.getY();

@@ -3,6 +3,7 @@ package it.gianlucacarlesso.checkers.logic;
 import java.util.ArrayList;
 
 import android.graphics.Point;
+import android.util.Log;
 
 public class Piece {
 	public int x;
@@ -53,15 +54,19 @@ public class Piece {
 		return moves;
 	}
 
-	private void eatOpponentPawn(Piece[][] board, ArrayList<ArrayList<Move>> moves, ArrayList<Move> sequence) {
-		// Control the direction of movement of the counter
+	private void eatOpponentPawn(Piece[][] board,
+			ArrayList<ArrayList<Move>> moves, ArrayList<Move> sequence) {
 		int direction = 1;
 		if (player == Player.PLAYER_WHITE) {
 			direction = -1;
 		}
 
 		Point current = sequence.get(sequence.size() - 1).pointTo;
-		
+		if (board[current.x][current.y] != null
+				&& board[current.x][current.y].dama) {
+			Log.i("xx", "iii");
+		}
+
 		// Control the move to the right of the counter
 		if (current.y - 1 >= 0
 				&& checkBound((current.x + 2 * direction), current.y - 2,
@@ -72,14 +77,14 @@ public class Piece {
 			// A pawn can not eat a Dama
 			if (!(!dama && board[current.x + 1 * direction][current.y - 1].dama)) {
 				ArrayList<Move> sequenceBuild = new ArrayList<Move>();
-				for(int i = 0; i<sequence.size();i++) {
+				for (int i = 0; i < sequence.size(); i++) {
 					sequenceBuild.add(sequence.get(i));
 				}
-				
+
 				sequenceBuild.add(new Move(current, new Point(current.x + 2
 						* direction, current.y - 2), dama, board[current.x + 1
 						* direction][current.y - 1]));
-				
+
 				moves.add(sequenceBuild);
 				eatOpponentPawn(board, moves, sequenceBuild);
 			}
@@ -95,14 +100,14 @@ public class Piece {
 			// A pawn can not eat a Dama
 			if (!(!dama && board[current.x + 1 * direction][current.y + 1].dama)) {
 				ArrayList<Move> sequenceBuild = new ArrayList<Move>();
-				for(int i = 0; i<sequence.size();i++) {
+				for (int i = 0; i < sequence.size(); i++) {
 					sequenceBuild.add(sequence.get(i));
 				}
-				
+
 				sequenceBuild.add(new Move(current, new Point(current.x + 2
 						* direction, current.y + 2), dama, board[current.x + 1
 						* direction][current.y + 1]));
-				
+
 				moves.add(sequenceBuild);
 				eatOpponentPawn(board, moves, sequenceBuild);
 			}
