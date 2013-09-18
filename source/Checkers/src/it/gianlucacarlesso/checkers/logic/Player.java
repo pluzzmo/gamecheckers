@@ -12,6 +12,7 @@ public class Player {
 
 	public static int NORMAL_MOVE = 1;
 	public static int NO_MOVE = 2;
+	public static int DELETED_MOVE = 3;
 
 	public ArrayList<Piece> pieces = new ArrayList<Piece>(PLAYER_PIECES);
 	public Stack<Move> moves = new Stack<Move>();
@@ -50,8 +51,8 @@ public class Player {
 		}
 	}
 
-	public boolean moveTo(Player playerOpposing, ArrayList<Move> sequence) {
-		boolean isMoved = false;
+	public int moveTo(Player playerOpposing, ArrayList<Move> sequence) {
+		int isMoved = NO_MOVE;
 		for (int i = 0; i < sequence.size(); i++) {
 			Move move = sequence.get(i);
 			Point from = move.pointFrom;
@@ -60,6 +61,9 @@ public class Player {
 
 			if (deleted != null) {
 				playerOpposing.deletePiece(deleted.x, deleted.y);
+				isMoved = DELETED_MOVE;
+			} else {
+				isMoved = NORMAL_MOVE;
 			}
 
 			// Check if the pawn can become a dama
@@ -71,26 +75,24 @@ public class Player {
 				isDama = true;
 			}
 
-			// // Checking if I have to remove a checker of the opponent
-			// Piece deleted = null;
-			// if (Math.abs(from.x - to.x) > 1) {
-			// int dir_x = 1;
-			// if (from.x > to.x) {
-			// dir_x = -1;
-			// }
-			//
-			// int dir_y = 1;
-			// if (from.y > to.y) {
-			// dir_y = -1;
-			// }
-			//
-			// deleted = playerOpposing.deletePiece(from.x + dir_x, from.y
-			// + dir_y);
-			// result = PAWN_ELIMINATED;
-			//
-			// } else {
-			// result = NORMAL_MOVE;
-			// }
+//			 // Checking if I have to remove a checker of the opponent
+//if(deleted == null){
+//			 if (Math.abs(from.x - to.x) > 1) {
+//			 int dir_x = 1;
+//			 if (from.x > to.x) {
+//			 dir_x = -1;
+//			 }
+//			
+//			 int dir_y = 1;
+//			 if (from.y > to.y) {
+//			 dir_y = -1;
+//			 }
+//			
+////			 deleted = playerOpposing.deletePiece(from.x + dir_x, from.y
+////			 + dir_y);
+////			
+//			 }
+//}
 
 			moves.add(new Move(from, to, isDama, deleted));
 
@@ -103,8 +105,6 @@ public class Player {
 					}
 				}
 			}
-
-			isMoved = true;
 		}
 
 		return isMoved;

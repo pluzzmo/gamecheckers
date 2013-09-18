@@ -19,8 +19,6 @@ public class Strategy {
 
 		values = values + player.pieces.size();
 		values = values - playerOpposing.pieces.size();
-		
-		double oldValues = values;
 
 		// Player turn
 		for (int i = 0; i < player.pieces.size(); i++) {
@@ -44,7 +42,7 @@ public class Strategy {
 			}
 		}
 		
-		values = values + Math.random() * 2;
+		//values = values + Math.random() * 2;
 
 		return values;
 	}

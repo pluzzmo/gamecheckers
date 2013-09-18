@@ -16,5 +16,9 @@
     <string name="player_2">Player 2</string>
     <string name="player">IA Player</string>
     <string name="player_man">Man Player</string>
+    <string name="Yes">OK</string>
+    <string name="No">NO</string>
+    <string name="winner">Vince</string>
+    <string name="par">Pari!</string>    
 
 </resources>

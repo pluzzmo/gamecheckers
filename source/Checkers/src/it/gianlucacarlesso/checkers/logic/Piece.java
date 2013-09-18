@@ -60,10 +60,8 @@ public class Piece {
 			direction = -1;
 		}
 
-		Point current = null;
-		for (int i = 0; i < sequence.size(); i++) {
-			current = sequence.get(i).pointTo;
-		}
+		Point current = sequence.get(sequence.size() - 1).pointTo;
+		
 		// Control the move to the right of the counter
 		if (current.y - 1 >= 0
 				&& checkBound((current.x + 2 * direction), current.y - 2,

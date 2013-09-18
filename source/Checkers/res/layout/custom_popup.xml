@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/custom_popup_layout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_gravity="center"
+    android:background="#70000000"
+    android:gravity="center"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/game_button"
+        android:gravity="center"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/TextMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="7dip"
+            android:gravity="center"
+            android:textColor="#ffffff"
+            android:textSize="45sp" >
+        </TextView>
+
+        <LinearLayout
+            android:id="@+id/LinearLayout02"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:gravity="center"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/OkButton"
+                android:layout_width="80dip"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dip"
+                android:layout_weight="1"
+                android:background="@drawable/game_button"
+                android:padding="5dip"
+                android:text="@string/Yes"
+                android:textColor="#ffffff"
+                android:textSize="22sp" >
+            </Button>
+
+            <Button
+                android:id="@+id/NoButton"
+                android:layout_width="80dip"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dip"
+                android:layout_weight="1"
+                android:background="@drawable/game_button"
+                android:padding="5dip"
+                android:text="@string/No"
+                android:textColor="#ffffff"
+                android:textSize="22sp" >
+            </Button>
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

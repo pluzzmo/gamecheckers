@@ -70,6 +70,9 @@ public class CheckerboardActivity extends Activity {
 		GBoard gboard = (GBoard) findViewById(R.id.board);
 		gboard.setGameMode(getIntent().getIntExtra(CheckerboardActivity.GAME_MODE, 0));
 
+		gboard.stringNamePlayerBlack = player1.getText().toString();
+		gboard.stringNamePlayerWhite = player2.getText().toString();
+
 	}
 
 }

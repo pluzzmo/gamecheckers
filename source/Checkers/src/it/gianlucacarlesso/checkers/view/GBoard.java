@@ -1,13 +1,15 @@
 package it.gianlucacarlesso.checkers.view;
 
-import java.util.ArrayList;
-
 import it.gianlucacarlesso.checkers.R;
 import it.gianlucacarlesso.checkers.logic.Engine;
 import it.gianlucacarlesso.checkers.logic.Move;
 import it.gianlucacarlesso.checkers.logic.Piece;
 import it.gianlucacarlesso.checkers.logic.Player;
 import it.gianlucacarlesso.checkers.utilities.DisplayProperties;
+
+import java.util.ArrayList;
+
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -15,6 +17,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.PointF;
+import android.os.CountDownTimer;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -23,8 +26,10 @@ public class GBoard extends View {
 	private static Point SIZE_BOARD_ORIGIN = new Point(1319, 1406);
 	private static Point CENTER_BOARD_ORIGIN = new Point(649, 627);
 	private static Point SIZE_BOX_ORIGIN = new Point(140, 140);
-	private Engine engine = null;
 
+	private Engine engine = null;
+	public String stringNamePlayerBlack;
+	public String stringNamePlayerWhite;
 	private Context context;
 	private Bitmap board;
 	private Bitmap piece_black;
@@ -138,7 +143,8 @@ public class GBoard extends View {
 							possible_image,
 							(float) ((float) matrix[sequence.get(j).pointTo.x][sequence
 									.get(j).pointTo.y].x + (pos_x / 2.0) + correct),
-							(float) matrix[sequence.get(j).pointTo.x][sequence.get(j).pointTo.y].y
+							(float) matrix[sequence.get(j).pointTo.x][sequence
+									.get(j).pointTo.y].y
 									+ (float) ((box_size_y - image_piece
 											.getHeight()) / 2.0), null);
 				}
@@ -148,41 +154,61 @@ public class GBoard extends View {
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		// Recovering the coordinates of the touch
-		float x = event.getX();
-		float y = event.getY();
+		if (engine.getGameMode() != Engine.GAME_MODE_MAN_VS_MAN
+				&& (engine.getPlayerTurn() != Player.PLAYER_BLACK || engine
+						.getGameMode() == Engine.GAME_MODE_IA_VS_IA)) {
+			// Recovering the coordinates of the touch
+			float x = event.getX();
+			float y = event.getY();
 
-		boolean correctAction = false;
-		for (int i = 0; i < Engine.NUM_BOX_ROW; i++) {
-			for (int j = 0; j < Engine.NUM_BOX_ROW; j++) {
-				if (matrix[i][j].x <= x
-						&& matrix[i][j].x + box_size_x >= x
-						// Individual touched the box and if present a pawn
-						// visualize the boxes where they can move
-						&& matrix[i][j].y <= y
-						&& matrix[i][j].y + box_size_y >= y) {
+			boolean correctAction = false;
+			for (int i = 0; i < Engine.NUM_BOX_ROW; i++) {
+				for (int j = 0; j < Engine.NUM_BOX_ROW; j++) {
+					if (matrix[i][j].x <= x
+							&& matrix[i][j].x + box_size_x >= x
+							// Individual touched the box and if present a pawn
+							// visualize the boxes where they can move
+							&& matrix[i][j].y <= y
+							&& matrix[i][j].y + box_size_y >= y) {
 
-					// Communicate the logical part of the selected box
-					correctAction = engine.estimateBox(new Point(i, j));
-					this.invalidate();
+						// Communicate the logical part of the selected box
+						correctAction = engine.estimateBox(new Point(i, j));
+						this.invalidate();
 
-					i = Engine.NUM_BOX_ROW + 1;
-					j = Engine.NUM_BOX_ROW + 1;
+						i = Engine.NUM_BOX_ROW + 1;
+						j = Engine.NUM_BOX_ROW + 1;
+					}
 				}
 			}
-		}
 
-		if (correctAction
-				&& engine.getGameMode() != Engine.GAME_MODE_MAN_VS_MAN
-				&& (engine.getPlayerTurn() == Player.PLAYER_BLACK || engine
-						.getGameMode() == Engine.GAME_MODE_IA_VS_IA)) {
-			// I perform the move of artificial intelligence. This always occurs
-			// when I perform the mode ia ia vs, or in the case of ia vs man is
-			// when the player's turn black
-			engine.moveIA();
-		}
-		this.invalidate();
+			int isWinner = engine.thereIsWinner();
+			if (isWinner == Engine.NO_WINNER
+					&& correctAction
+					&& engine.getGameMode() != Engine.GAME_MODE_MAN_VS_MAN
+					&& (engine.getPlayerTurn() == Player.PLAYER_BLACK || engine
+							.getGameMode() == Engine.GAME_MODE_IA_VS_IA)) {
+				// I perform the move of artificial intelligence. This always
+				// occurs
+				// when I perform the mode ia ia vs, or in the case of ia vs man
+				// is
+				// when the player's turn black
+				new CountDownTimer(2000, 100) {
+					public void onTick(long millisUntilFinished) {
 
+					}
+
+					public void onFinish() {
+						engine.moveIA();
+						isWinner();
+						GBoard.this.invalidate();
+					}
+				}.start();
+
+				isWinner = engine.thereIsWinner();
+			}
+			isWinner();
+			this.invalidate();
+		}
 		return false;
 	}
 
@@ -331,6 +357,35 @@ public class GBoard extends View {
 			engine = new Engine(gameMode);
 		} else {
 			engine = new Engine(gameMode);
+		}
+	}
+
+	public void isWinner() {
+		int isWinner = engine.thereIsWinner();
+		if (isWinner != Engine.NO_WINNER) {
+			String name = "";
+			if (isWinner == Player.PLAYER_BLACK
+					|| isWinner == Player.PLAYER_WHITE) {
+				if (isWinner == Player.PLAYER_BLACK) {
+					name = stringNamePlayerBlack;
+				} else {
+					name = stringNamePlayerWhite;
+				}
+
+				name = getResources().getString(R.string.winner) + " " + name;
+			} else if (isWinner == Engine.PLAYERS_PAR) {
+				name = getResources().getString(R.string.par);
+			}
+			CustomPopup cp = new CustomPopup(context, name) {
+
+				@Override
+				public void onClick(View v) {
+					this.dismiss();
+					((Activity) context).finish();
+				}
+			};
+			cp.getNoButton().setVisibility(View.GONE);
+			cp.show();
 		}
 	}
 }

@@ -9,7 +9,11 @@ public class Engine {
 	public static int GAME_MODE_IA_VS_IA = 0;
 	public static int GAME_MODE_IA_VS_MAN = 1;
 	public static int GAME_MODE_MAN_VS_MAN = 2;
+	public static int PLAYERS_PAR = -2;
+	public static int NO_WINNER = -1;
 	private static int DEEP_SEARCH = 1;
+	private static int MAX_MOVES_NO_MOVES = 15;
+	public int moves_no_moves = 0;
 
 	public static int NUM_BOX_ROW = 8;
 	public static int PLAYER_ROWS = 3;
@@ -52,6 +56,7 @@ public class Engine {
 	}
 
 	public ArrayList<ArrayList<Move>> getNextPossibleMoves() {
+		boardPlayersSync();
 		if (current_selected != null) {
 			return current_selected.possibleMoves(board);
 		} else {
@@ -79,7 +84,7 @@ public class Engine {
 
 	public boolean executeAction(Move move) {
 		ArrayList<ArrayList<Move>> moves = getNextPossibleMoves();
-		boolean isMoved = false;
+		int isMoved = Player.NO_MOVE;
 
 		if (moves != null) {
 			// I run the player's move
@@ -106,24 +111,31 @@ public class Engine {
 						}
 
 						isMoved = player.moveTo(playerOpposing, sequence);
-						boardPlayersSync();
 						k = moves.size();
 					}
 				}
 			}
 		}
 
-		if (isMoved) {
+		boolean res = false;
+		if (isMoved != Player.NO_MOVE) {
+			res = true;
 			if (playerTurn == Player.PLAYER_BLACK) {
 				playerTurn = Player.PLAYER_WHITE;
 			} else {
 				playerTurn = Player.PLAYER_BLACK;
 			}
 			current_selected = null;
+			
+			if(isMoved == Player.DELETED_MOVE) {
+				moves_no_moves = 0;
+			} else {
+				moves_no_moves++;
+			}
 		}
-
+		
 		boardPlayersSync();
-		return isMoved;
+		return res;
 	}
 
 	private Move moveIA(int current_deep) {
@@ -149,7 +161,6 @@ public class Engine {
 			int oldPlayerTurn = playerTurn;
 			for (int i = 0; i < player.pieces.size(); i++) {
 				current_selected = player.pieces.get(i);
-				Piece oldCurrentSelected = current_selected;
 				int currentPlayerTurn = oldPlayerTurn;
 				moves = getNextPossibleMoves();
 
@@ -174,18 +185,19 @@ public class Engine {
 						player.revertMoveTo(playerOpposing, warehouse.pop());
 					}
 					playerTurn = currentPlayerTurn;
-					current_selected = oldCurrentSelected;
+					boardPlayersSync();
 				}
 
 			}
 			playerTurn = oldPlayerTurn;
 		}
-
 		return move;
 	}
 
 	public void moveIA() {
+		int move_no_moves_dump = moves_no_moves;
 		Move move = moveIA(0);
+		moves_no_moves = move_no_moves_dump;
 		// current_selected = move.piece;
 
 		current_selected = board[move.pointFrom.x][move.pointFrom.y];
@@ -219,5 +231,21 @@ public class Engine {
 	
 	public int getPlayerTurn() {
 		return playerTurn;
+	}
+	
+	public int thereIsWinner() {
+		int winner = NO_WINNER;
+		if(playerBlack.pieces.size() == 0) {
+			winner = Player.PLAYER_WHITE;
+		}
+		
+		if(playerWhite.pieces.size() == 0) {
+			winner = Player.PLAYER_BLACK;
+		}
+		
+		if(moves_no_moves > MAX_MOVES_NO_MOVES) {
+			winner = PLAYERS_PAR;
+		}
+		return winner;
 	}
 }
