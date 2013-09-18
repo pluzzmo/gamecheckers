@@ -1,5 +1,6 @@
 package it.gianlucacarlesso.checkers;
 
+import it.gianlucacarlesso.checkers.logic.Strategy;
 import it.gianlucacarlesso.checkers.utilities.DisplayProperties;
 import it.gianlucacarlesso.checkers.utilities.ImageUtilities;
 import android.os.Build;
@@ -64,7 +65,7 @@ public class CheckersActivity extends Activity {
 
 		// TODO REMOVE
 		Intent intent = new Intent(this, CheckerboardActivity.class);
-		intent.putExtra(CheckerboardActivity.GAME_MODE, 1);
+		intent.putExtra(CheckerboardActivity.GAME_MODE, 0);
 		startActivity(intent);
 	}
 
@@ -73,8 +74,11 @@ public class CheckersActivity extends Activity {
 
 		if (view.getId() == R.id.button_iavsia) {
 			intent.putExtra(CheckerboardActivity.GAME_MODE, 0);
+			intent.putExtra(CheckerboardActivity.STRATEGY_PLAYER_BLACK, Strategy.AVARAGE_STRATEGY);
+			intent.putExtra(CheckerboardActivity.STRATEGY_PLAYER_WHITE, Strategy.AVARAGE_STRATEGY);
 		} else if(view.getId() == R.id.button_manvsia) {
 			intent.putExtra(CheckerboardActivity.GAME_MODE, 1);
+			intent.putExtra(CheckerboardActivity.STRATEGY_PLAYER_BLACK, Strategy.SIMPLE_STRATEGY);
 		} else {
 			intent.putExtra(CheckerboardActivity.GAME_MODE, 2);
 		}

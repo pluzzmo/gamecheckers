@@ -18,6 +18,7 @@ import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.PointF;
 import android.os.CountDownTimer;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -49,6 +50,9 @@ public class GBoard extends View {
 	private PointF[][] matrix = new PointF[Engine.NUM_BOX_ROW][Engine.NUM_BOX_ROW];
 	private float correct = 0;
 	private ArrayList<ArrayList<Move>> moves = null;
+
+	public Handler handlerIA = null;
+	public Runnable run_ia = null;
 
 	float box_size_x;
 	float box_size_y;
@@ -155,7 +159,8 @@ public class GBoard extends View {
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		if (engine.getGameMode() == Engine.GAME_MODE_MAN_VS_MAN
-				|| (engine.getPlayerTurn() != Player.PLAYER_BLACK)) {
+				|| (engine.getPlayerTurn() != Player.PLAYER_BLACK && engine
+						.getGameMode() == Engine.GAME_MODE_IA_VS_MAN)) {
 			// Recovering the coordinates of the touch
 			float x = event.getX();
 			float y = event.getY();
@@ -181,11 +186,9 @@ public class GBoard extends View {
 			}
 
 			int isWinner = engine.thereIsWinner();
-			if (isWinner == Engine.NO_WINNER
-					&& correctAction
+			if (isWinner == Engine.NO_WINNER && correctAction
 					&& engine.getGameMode() != Engine.GAME_MODE_MAN_VS_MAN
-					&& (engine.getPlayerTurn() == Player.PLAYER_BLACK || engine
-							.getGameMode() == Engine.GAME_MODE_IA_VS_IA)) {
+					&& (engine.getPlayerTurn() == Player.PLAYER_BLACK)) {
 				// I perform the move of artificial intelligence. This always
 				// occurs
 				// when I perform the mode ia ia vs, or in the case of ia vs man
@@ -197,15 +200,15 @@ public class GBoard extends View {
 					}
 
 					public void onFinish() {
-						engine.moveIA();
-						isWinner();
+						boolean result = engine.moveIA();
+						isWinner(result);
 						GBoard.this.invalidate();
 					}
 				}.start();
 
 				isWinner = engine.thereIsWinner();
 			}
-			isWinner();
+			isWinner(true);
 			this.invalidate();
 		}
 		return false;
@@ -218,6 +221,36 @@ public class GBoard extends View {
 		if (board != null) {
 			setMeasuredDimension(board.getWidth(), board.getHeight());
 		}
+	}
+
+	public void gameModeIAvsIA() {
+		// I perform the move of artificial intelligence. This always
+		// occurs
+		// when I perform the mode ia ia vs, or in the case of ia vs man
+		// is
+		// when the player's turn black
+		final Handler handler = new Handler();
+		handlerIA = handler;
+		run_ia = new Runnable() {
+			public void run() {
+				boolean result = engine.moveIA();
+
+				GBoard.this.invalidate();
+
+				if (result == false) {
+
+					isWinner(result);
+				} else if (engine.thereIsWinner() == Engine.NO_WINNER) {
+					gameModeIAvsIA();
+				} else {
+					if (engine.thereIsWinner() != Engine.NO_WINNER) {
+						isWinner(true);
+					}
+				}
+			}
+		};
+		
+		handlerIA.postDelayed(run_ia, 500);
 	}
 
 	private void graphicInitialization() {
@@ -350,31 +383,24 @@ public class GBoard extends View {
 	}
 
 	public void setGameMode(int gameMode) {
-		if (gameMode == Engine.GAME_MODE_IA_VS_IA) {
-			engine = new Engine(gameMode);
-		} else if (gameMode == Engine.GAME_MODE_IA_VS_MAN) {
-			engine = new Engine(gameMode);
-		} else {
-			engine = new Engine(gameMode);
+		engine = new Engine(gameMode);
+
+		if (engine.getGameMode() == Engine.GAME_MODE_IA_VS_IA) {
+			gameModeIAvsIA();
 		}
 	}
 
-	public void isWinner() {
-		int isWinner = engine.thereIsWinner();
-		if (isWinner != Engine.NO_WINNER) {
+	public void isWinner(boolean result) {
+		if (result == false) {
 			String name = "";
-			if (isWinner == Player.PLAYER_BLACK
-					|| isWinner == Player.PLAYER_WHITE) {
-				if (isWinner == Player.PLAYER_BLACK) {
-					name = stringNamePlayerBlack;
-				} else {
-					name = stringNamePlayerWhite;
-				}
-
-				name = getResources().getString(R.string.winner) + " " + name;
-			} else if (isWinner == Engine.PLAYERS_PAR) {
-				name = getResources().getString(R.string.par);
+			if (engine.getPlayerTurn() == Player.PLAYER_BLACK) {
+				name = stringNamePlayerBlack;
+			} else {
+				name = stringNamePlayerWhite;
 			}
+
+			name = name + " " + getResources().getString(R.string.surrender);
+
 			CustomPopup cp = new CustomPopup(context, name) {
 
 				@Override
@@ -385,6 +411,42 @@ public class GBoard extends View {
 			};
 			cp.getNoButton().setVisibility(View.GONE);
 			cp.show();
+		} else {
+			int isWinner = engine.thereIsWinner();
+			if (isWinner != Engine.NO_WINNER) {
+				String name = "";
+				if (isWinner == Player.PLAYER_BLACK
+						|| isWinner == Player.PLAYER_WHITE) {
+					if (isWinner == Player.PLAYER_BLACK) {
+						name = stringNamePlayerBlack;
+					} else {
+						name = stringNamePlayerWhite;
+					}
+
+					name = getResources().getString(R.string.winner) + " "
+							+ name;
+				} else if (isWinner == Engine.PLAYERS_PAR) {
+					name = getResources().getString(R.string.par);
+				}
+				CustomPopup cp = new CustomPopup(context, name) {
+
+					@Override
+					public void onClick(View v) {
+						this.dismiss();
+						((Activity) context).finish();
+					}
+				};
+				cp.getNoButton().setVisibility(View.GONE);
+				cp.show();
+			}
+		}
+	}
+
+	public void setStrategy(int player, int strategy) {
+		if (player == Player.PLAYER_BLACK) {
+			engine.playerBlackStrategy = strategy;
+		} else {
+			engine.playerWhiteStrategy = strategy;
 		}
 	}
 }

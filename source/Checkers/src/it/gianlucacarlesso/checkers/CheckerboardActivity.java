@@ -1,5 +1,6 @@
 package it.gianlucacarlesso.checkers;
 
+import it.gianlucacarlesso.checkers.logic.Player;
 import it.gianlucacarlesso.checkers.utilities.DisplayProperties;
 import it.gianlucacarlesso.checkers.utilities.ImageUtilities;
 import it.gianlucacarlesso.checkers.view.GBoard;
@@ -16,6 +17,10 @@ import android.graphics.drawable.Drawable;
 
 public class CheckerboardActivity extends Activity {
 	public static String GAME_MODE = "game_mode";
+	public static String STRATEGY_PLAYER_BLACK = "strategy_black";
+	public static String STRATEGY_PLAYER_WHITE = "strategy_white";
+	
+	private GBoard gboard;
 
 	@SuppressWarnings("deprecation")
 	@Override
@@ -65,14 +70,31 @@ public class CheckerboardActivity extends Activity {
 				"fonts/curse_casual.ttf");
 		player1.setTypeface(typface);
 		player2.setTypeface(typface);
-		
+
 		// Imposed on the game mode Damiera
-		GBoard gboard = (GBoard) findViewById(R.id.board);
-		gboard.setGameMode(getIntent().getIntExtra(CheckerboardActivity.GAME_MODE, 0));
+		gboard = (GBoard) findViewById(R.id.board);
+		gboard.setGameMode(getIntent().getIntExtra(
+				CheckerboardActivity.GAME_MODE, 0));
 
 		gboard.stringNamePlayerBlack = player1.getText().toString();
 		gboard.stringNamePlayerWhite = player2.getText().toString();
-
+		
+		if (getIntent().getIntExtra(CheckerboardActivity.GAME_MODE, 0) == 0) {
+			// IA vs IA game mode
+			gboard.setStrategy(Player.PLAYER_BLACK, getIntent().getIntExtra(CheckerboardActivity.STRATEGY_PLAYER_BLACK, 0));
+			gboard.setStrategy(Player.PLAYER_WHITE, getIntent().getIntExtra(CheckerboardActivity.STRATEGY_PLAYER_WHITE, 0));
+		} else if (getIntent().getIntExtra(CheckerboardActivity.GAME_MODE, 0) == 1) {
+			// Man vs IA game mode
+			gboard.setStrategy(Player.PLAYER_BLACK, getIntent().getIntExtra(CheckerboardActivity.STRATEGY_PLAYER_BLACK, 0));
+		}
 	}
 
+	   @Override
+	    public void onDestroy()
+	    {
+	        super.onDestroy();
+	        if(gboard.handlerIA != null && gboard.run_ia != null) {
+	        	gboard.handlerIA.removeCallbacks(gboard.run_ia);
+	        }
+	    }
 }

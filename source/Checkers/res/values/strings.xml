@@ -19,6 +19,7 @@
     <string name="Yes">OK</string>
     <string name="No">NO</string>
     <string name="winner">Vince</string>
-    <string name="par">Pari!</string>    
+    <string name="par">Pari!</string>  
+    <string name="surrender">si arrende!</string>  
 
 </resources>

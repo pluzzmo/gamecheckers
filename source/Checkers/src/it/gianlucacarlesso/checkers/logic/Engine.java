@@ -1,10 +1,10 @@
 package it.gianlucacarlesso.checkers.logic;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Stack;
 
 import android.graphics.Point;
-import android.util.Log;
 
 public class Engine {
 	public static int GAME_MODE_IA_VS_IA = 0;
@@ -13,8 +13,11 @@ public class Engine {
 	public static int PLAYERS_PAR = -2;
 	public static int NO_WINNER = -1;
 	private static int DEEP_SEARCH = 1;
-	private static int MAX_MOVES_NO_MOVES = 15;
+	private static int MAX_MOVES_NO_MOVES = 25;
 	public int moves_no_moves = 0;
+
+	public int playerBlackStrategy = 0;
+	public int playerWhiteStrategy = 0;
 
 	public static int NUM_BOX_ROW = 8;
 	public static int PLAYER_ROWS = 3;
@@ -135,7 +138,7 @@ public class Engine {
 		double newValue = -100000;
 		double oldValue = -100000;
 		ArrayList<Move> sequence = null;
-		ArrayList<Move> sequenceTmp = null;
+		ArrayList<ArrayList<Move>> possibleSequence = new ArrayList<ArrayList<Move>>();
 
 		if (current_deep < DEEP_SEARCH) {
 			ArrayList<ArrayList<Move>> moves = null;
@@ -160,15 +163,24 @@ public class Engine {
 				for (int k = 0; k < moves.size(); k++) {
 					oldValue = valueCurrentBoard(playerTurn);
 
-					sequenceTmp = moves.get(k);
-					executeAction(sequenceTmp);
+					sequence = moves.get(k);
+					executeAction(sequence);
 					playerTurn = oldPlayerTurn;
-					warehouse.add(sequenceTmp);
+					warehouse.add(sequence);
 					// moveIA(current_deep + 1, cur);
 					newValue = valueCurrentBoard(playerTurn);
-					if (newValue >= oldValue && newValue > maxValue) {
-						maxValue = newValue;
-						sequence = sequenceTmp;
+					if (newValue >= oldValue) {
+						if (newValue > maxValue) {
+							maxValue = newValue;
+							// Optimal change, delete all previous moves
+							possibleSequence.clear();
+							possibleSequence.add(sequence);
+						} else if (newValue == oldValue) {
+							// If I have the moves with equal value, I keep them
+							// all and in the end I choose one at random between
+							// them
+							possibleSequence.add(sequence);
+						}
 					}
 
 					for (int j = 0; j < warehouse.size(); j++) {
@@ -181,22 +193,52 @@ public class Engine {
 			}
 			playerTurn = oldPlayerTurn;
 		}
+
+		if (possibleSequence.size() > 0) {
+			// Randomly choose the setup step
+			int sequenceSelected = new Random()
+					.nextInt(possibleSequence.size());
+			sequence = possibleSequence.get(sequenceSelected);
+		} else {
+			sequence = null;
+		}
+
 		return sequence;
 	}
 
-	public void moveIA() {
+	public boolean moveIA() {
 		int move_no_moves_dump = moves_no_moves;
+
+		// Individual to perform the move
 		ArrayList<Move> sequence = moveIA(0);
 		moves_no_moves = move_no_moves_dump;
-		// current_selected = move.piece;
 
-		current_selected = board[sequence.get(0).pointFrom.x][sequence.get(0).pointFrom.y];
-		executeAction(sequence);
+		if (sequence == null || sequence.size() == 0) {
+			return false;
+		} else {
+			current_selected = board[sequence.get(0).pointFrom.x][sequence
+					.get(0).pointFrom.y];
+			executeAction(sequence);
+			return true;
+		}
 	}
 
 	private double valueCurrentBoard(int player_in_turn) {
+		int fun = 0;
+		if (player_in_turn == Player.PLAYER_BLACK) {
+			fun = playerBlackStrategy;
+		} else {
+			fun = playerWhiteStrategy;
+		}
 
-		return Strategy.simpleStrategy(this, player_in_turn);
+		switch (fun) {
+		case 0:
+			return Strategy.simpleStrategy(this, player_in_turn);
+		case 1:
+			return Strategy.avarageStrategy(this, player_in_turn);
+		default:
+			return Strategy.simpleStrategy(this, player_in_turn);
+		}
 	}
 
 	public boolean isElementInBoard(Point point) {
