@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 import android.graphics.Point;
+import android.util.Log;
 
 public class Engine {
 	public static int GAME_MODE_IA_VS_IA = 0;
@@ -75,47 +76,38 @@ public class Engine {
 			}
 			result = false;
 		} else if (current_selected != null && board[point.x][point.y] == null) {
-			result = executeAction(new Move(new Point(current_selected.x,
-					current_selected.y), point, current_selected.dama, null));
+			ArrayList<ArrayList<Move>> moves = getNextPossibleMoves();
+			ArrayList<Move> sequence = null;
+			for (int i = 0; i < moves.size(); i++) {
+				sequence = moves.get(i);
+				Point first = sequence.get(0).pointFrom;
+				Point last = sequence.get(sequence.size() - 1).pointTo;
+				if (first.x == current_selected.x
+						&& first.y == current_selected.y && last.x == point.x
+						&& last.y == point.y) {
+					i = moves.size();
+				}
+			}
+			result = executeAction(sequence);
 		}
 
 		return result;
 	}
 
-	public boolean executeAction(Move move) {
-		ArrayList<ArrayList<Move>> moves = getNextPossibleMoves();
+	public boolean executeAction(ArrayList<Move> sequence) {
 		int isMoved = Player.NO_MOVE;
-
-		if (moves != null) {
-			// I run the player's move
-			for (int k = 0; k < moves.size(); k++) {
-				// Checking that the move is valid
-				ArrayList<Move> sequence = moves.get(k);
-
-				if (sequence.size() > 0) {
-					Move first = sequence.get(0);
-					Move last = sequence.get(sequence.size() - 1);
-
-					if (first.pointFrom.x == move.pointFrom.x
-							&& first.pointFrom.y == move.pointFrom.y
-							&& last.pointTo.x == move.pointTo.x
-							&& last.pointTo.y == move.pointTo.y) {
-						Player player = null;
-						Player playerOpposing = null;
-						if (Player.PLAYER_BLACK == playerTurn) {
-							player = playerBlack;
-							playerOpposing = playerWhite;
-						} else {
-							player = playerWhite;
-							playerOpposing = playerBlack;
-						}
-
-						isMoved = player.moveTo(playerOpposing, sequence);
-						k = moves.size();
-					}
-				}
-			}
+		// I run the player's move
+		Player player = null;
+		Player playerOpposing = null;
+		if (Player.PLAYER_BLACK == playerTurn) {
+			player = playerBlack;
+			playerOpposing = playerWhite;
+		} else {
+			player = playerWhite;
+			playerOpposing = playerBlack;
 		}
+
+		isMoved = player.moveTo(playerOpposing, sequence);
 
 		boolean res = false;
 		if (isMoved != Player.NO_MOVE) {
@@ -126,23 +118,24 @@ public class Engine {
 				playerTurn = Player.PLAYER_BLACK;
 			}
 			current_selected = null;
-			
-			if(isMoved == Player.DELETED_MOVE) {
+
+			if (isMoved == Player.DELETED_MOVE) {
 				moves_no_moves = 0;
 			} else {
 				moves_no_moves++;
 			}
 		}
-		
+
 		boardPlayersSync();
 		return res;
 	}
 
-	private Move moveIA(int current_deep) {
+	private ArrayList<Move> moveIA(int current_deep) {
 		double maxValue = -100000;
 		double newValue = -100000;
 		double oldValue = -100000;
-		Move move = null;
+		ArrayList<Move> sequence = null;
+		ArrayList<Move> sequenceTmp = null;
 
 		if (current_deep < DEEP_SEARCH) {
 			ArrayList<ArrayList<Move>> moves = null;
@@ -167,18 +160,15 @@ public class Engine {
 				for (int k = 0; k < moves.size(); k++) {
 					oldValue = valueCurrentBoard(playerTurn);
 
-					ArrayList<Move> sequence = moves.get(k);
-					Move moveTmp = new Move(sequence.get(0).pointFrom,
-							sequence.get(sequence.size() - 1).pointTo,
-							sequence.get(0).isDama, sequence.get(0).pawnDeleted);
-					executeAction(moveTmp);
+					sequenceTmp = moves.get(k);
+					executeAction(sequenceTmp);
 					playerTurn = oldPlayerTurn;
-					warehouse.add(sequence);
+					warehouse.add(sequenceTmp);
 					// moveIA(current_deep + 1, cur);
 					newValue = valueCurrentBoard(playerTurn);
 					if (newValue >= oldValue && newValue > maxValue) {
 						maxValue = newValue;
-						move = moveTmp;
+						sequence = sequenceTmp;
 					}
 
 					for (int j = 0; j < warehouse.size(); j++) {
@@ -191,17 +181,17 @@ public class Engine {
 			}
 			playerTurn = oldPlayerTurn;
 		}
-		return move;
+		return sequence;
 	}
 
 	public void moveIA() {
 		int move_no_moves_dump = moves_no_moves;
-		Move move = moveIA(0);
+		ArrayList<Move> sequence = moveIA(0);
 		moves_no_moves = move_no_moves_dump;
 		// current_selected = move.piece;
 
-		current_selected = board[move.pointFrom.x][move.pointFrom.y];
-		executeAction(move);
+		current_selected = board[sequence.get(0).pointFrom.x][sequence.get(0).pointFrom.y];
+		executeAction(sequence);
 	}
 
 	private double valueCurrentBoard(int player_in_turn) {
@@ -228,22 +218,22 @@ public class Engine {
 	public int getGameMode() {
 		return gameMode;
 	}
-	
+
 	public int getPlayerTurn() {
 		return playerTurn;
 	}
-	
+
 	public int thereIsWinner() {
 		int winner = NO_WINNER;
-		if(playerBlack.pieces.size() == 0) {
+		if (playerBlack.pieces.size() == 0) {
 			winner = Player.PLAYER_WHITE;
 		}
-		
-		if(playerWhite.pieces.size() == 0) {
+
+		if (playerWhite.pieces.size() == 0) {
 			winner = Player.PLAYER_BLACK;
 		}
-		
-		if(moves_no_moves > MAX_MOVES_NO_MOVES) {
+
+		if (moves_no_moves > MAX_MOVES_NO_MOVES) {
 			winner = PLAYERS_PAR;
 		}
 		return winner;
