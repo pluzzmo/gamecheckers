@@ -3,7 +3,6 @@ package it.gianlucacarlesso.checkers.logic;
 import java.util.ArrayList;
 
 import android.graphics.Point;
-import android.util.Log;
 
 public class Piece {
 	public int x;
@@ -62,10 +61,6 @@ public class Piece {
 		}
 
 		Point current = sequence.get(sequence.size() - 1).pointTo;
-		if (board[current.x][current.y] != null
-				&& board[current.x][current.y].dama) {
-			Log.i("xx", "iii");
-		}
 
 		// Control the move to the right of the counter
 		if (current.y - 1 >= 0

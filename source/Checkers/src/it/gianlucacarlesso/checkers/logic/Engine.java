@@ -13,7 +13,7 @@ public class Engine {
 	public static int PLAYERS_PAR = -2;
 	public static int NO_WINNER = -1;
 	private static int DEEP_SEARCH = 1;
-	private static int MAX_MOVES_NO_MOVES = 40;
+	private static int MAX_MOVES_NO_MOVES = 60;
 	public int moves_no_moves = 0;
 
 	public int playerBlackStrategy = 0;
@@ -137,8 +137,10 @@ public class Engine {
 		double maxValue = -100000;
 		double newValue = -100000;
 		double oldValue = -100000;
+		double maxValueWorst = -100000;
 		ArrayList<Move> sequence = null;
 		ArrayList<ArrayList<Move>> possibleSequence = new ArrayList<ArrayList<Move>>();
+		ArrayList<ArrayList<Move>> possibleSequenceWorst = new ArrayList<ArrayList<Move>>();
 
 		if (current_deep < DEEP_SEARCH) {
 			ArrayList<ArrayList<Move>> moves = null;
@@ -181,6 +183,15 @@ public class Engine {
 							// them
 							possibleSequence.add(sequence);
 						}
+					} else {
+						// Except for the least worst
+						if (possibleSequence.size() == 0) {
+							if (newValue > maxValueWorst) {
+								maxValueWorst = newValue;
+								possibleSequenceWorst.clear();
+								possibleSequenceWorst.add(sequence);
+							}
+						}
 					}
 
 					for (int j = 0; j < warehouse.size(); j++) {
@@ -200,7 +211,14 @@ public class Engine {
 					.nextInt(possibleSequence.size());
 			sequence = possibleSequence.get(sequenceSelected);
 		} else {
-			sequence = null;
+			if (possibleSequenceWorst.size() > 0) {
+				// Randomly choose the setup step
+				int sequenceSelected = new Random()
+						.nextInt(possibleSequenceWorst.size());
+				sequence = possibleSequenceWorst.get(sequenceSelected);
+			} else {
+				sequence = null;
+			}
 		}
 
 		return sequence;
@@ -233,11 +251,14 @@ public class Engine {
 
 		switch (fun) {
 		case 0:
-			return Strategy.simpleStrategy(this, player_in_turn, moves_no_moves >= MAX_MOVES_NO_MOVES / 2);
+			return Strategy.simpleStrategy(this, player_in_turn,
+					moves_no_moves >= MAX_MOVES_NO_MOVES / 2);
 		case 1:
-			return Strategy.avarageStrategy(this, player_in_turn, moves_no_moves >= MAX_MOVES_NO_MOVES / 2);
+			return Strategy.avarageStrategy(this, player_in_turn,
+					moves_no_moves >= MAX_MOVES_NO_MOVES / 2);
 		default:
-			return Strategy.simpleStrategy(this, player_in_turn, moves_no_moves >= MAX_MOVES_NO_MOVES / 2);
+			return Strategy.simpleStrategy(this, player_in_turn,
+					moves_no_moves >= MAX_MOVES_NO_MOVES / 2);
 		}
 	}
 
