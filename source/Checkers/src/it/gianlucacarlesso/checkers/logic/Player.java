@@ -65,34 +65,16 @@ public class Player {
 			} else {
 				isMoved = NORMAL_MOVE;
 			}
-
+			
+			Piece piece = getPiece(from.x, from.y);
+			boolean isDama = piece.dama;
 			// Check if the pawn can become a dama
-			boolean isDama = false;
-			if (playerType == Player.PLAYER_BLACK
+			if (piece.dama == false && playerType == Player.PLAYER_BLACK
 					&& to.x == Engine.NUM_BOX_ROW - 1) {
 				isDama = true;
-			} else if (playerType == Player.PLAYER_WHITE && to.x == 0) {
+			} else if (piece.dama == false && playerType == Player.PLAYER_WHITE && to.x == 0) {
 				isDama = true;
 			}
-
-//			 // Checking if I have to remove a checker of the opponent
-//if(deleted == null){
-//			 if (Math.abs(from.x - to.x) > 1) {
-//			 int dir_x = 1;
-//			 if (from.x > to.x) {
-//			 dir_x = -1;
-//			 }
-//			
-//			 int dir_y = 1;
-//			 if (from.y > to.y) {
-//			 dir_y = -1;
-//			 }
-//			
-////			 deleted = playerOpposing.deletePiece(from.x + dir_x, from.y
-////			 + dir_y);
-////			
-//			 }
-//}
 
 			moves.add(new Move(from, to, isDama, deleted));
 
@@ -136,10 +118,6 @@ public class Player {
 		for (int j = sequence.size() - 1; j >= 0; j--) {
 			Move move = sequence.get(j);
 
-			// boolean isDama = false;
-			// if (move.isDama) {
-			// isDama = true;
-			// }
 			Point from = move.pointTo;
 			Point to = move.pointFrom;
 			for (int k = 0; k < pieces.size(); k++) {

@@ -78,7 +78,7 @@ public class CheckersActivity extends Activity {
 			intent.putExtra(CheckerboardActivity.STRATEGY_PLAYER_WHITE, Strategy.AVARAGE_STRATEGY);
 		} else if(view.getId() == R.id.button_manvsia) {
 			intent.putExtra(CheckerboardActivity.GAME_MODE, 1);
-			intent.putExtra(CheckerboardActivity.STRATEGY_PLAYER_BLACK, Strategy.SIMPLE_STRATEGY);
+			intent.putExtra(CheckerboardActivity.STRATEGY_PLAYER_BLACK, Strategy.AVARAGE_STRATEGY);
 		} else {
 			intent.putExtra(CheckerboardActivity.GAME_MODE, 2);
 		}

@@ -13,7 +13,7 @@ public class Engine {
 	public static int PLAYERS_PAR = -2;
 	public static int NO_WINNER = -1;
 	private static int DEEP_SEARCH = 1;
-	private static int MAX_MOVES_NO_MOVES = 25;
+	private static int MAX_MOVES_NO_MOVES = 40;
 	public int moves_no_moves = 0;
 
 	public int playerBlackStrategy = 0;
@@ -233,11 +233,11 @@ public class Engine {
 
 		switch (fun) {
 		case 0:
-			return Strategy.simpleStrategy(this, player_in_turn);
+			return Strategy.simpleStrategy(this, player_in_turn, moves_no_moves >= MAX_MOVES_NO_MOVES / 2);
 		case 1:
-			return Strategy.avarageStrategy(this, player_in_turn);
+			return Strategy.avarageStrategy(this, player_in_turn, moves_no_moves >= MAX_MOVES_NO_MOVES / 2);
 		default:
-			return Strategy.simpleStrategy(this, player_in_turn);
+			return Strategy.simpleStrategy(this, player_in_turn, moves_no_moves >= MAX_MOVES_NO_MOVES / 2);
 		}
 	}
 

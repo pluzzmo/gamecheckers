@@ -17,7 +17,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.PointF;
-import android.os.CountDownTimer;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -194,17 +193,17 @@ public class GBoard extends View {
 				// when I perform the mode ia ia vs, or in the case of ia vs man
 				// is
 				// when the player's turn black
-				new CountDownTimer(2000, 100) {
-					public void onTick(long millisUntilFinished) {
-
-					}
-
-					public void onFinish() {
+				final Handler handler = new Handler();
+				handlerIA = handler;
+				run_ia = new Runnable() {
+					public void run() {
 						boolean result = engine.moveIA();
 						isWinner(result);
 						GBoard.this.invalidate();
 					}
-				}.start();
+				};
+				
+				handlerIA.postDelayed(run_ia, 250);
 
 				isWinner = engine.thereIsWinner();
 			}
@@ -250,7 +249,7 @@ public class GBoard extends View {
 			}
 		};
 		
-		handlerIA.postDelayed(run_ia, 500);
+		handlerIA.postDelayed(run_ia, 250);
 	}
 
 	private void graphicInitialization() {
