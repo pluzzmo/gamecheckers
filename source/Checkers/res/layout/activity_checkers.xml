@@ -202,6 +202,41 @@
                         android:textColor="#ffffff"
                         android:textSize="35sp" />
                 </LinearLayout>
+                
+                                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="15dp"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="0dp" >
+
+                    <TextView
+                        android:id="@+id/delay"
+                        style="@style/TextShadow"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginTop="0dp"
+                        android:gravity="center"
+                        android:text="@string/delay"
+                        android:textColor="#ffffff"
+                        android:textSize="35sp" />
+
+                    <EditText
+                        android:id="@+id/delay_value"
+                        style="@style/TextShadow"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="0dp"
+                        android:background="@drawable/game_button"
+                        android:gravity="center"
+                        android:padding="5dp"
+                        android:text="@string/m1000"
+                        android:textAlignment="center"
+                        android:textColor="#ffffff"
+                        android:textSize="35sp" />
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
 

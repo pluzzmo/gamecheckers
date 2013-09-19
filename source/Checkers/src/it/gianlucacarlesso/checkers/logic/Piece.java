@@ -10,18 +10,6 @@ public class Piece {
 	public int player;
 	public boolean dama = false;
 
-//	public Piece(int _x, int _y) {
-//		x = _x;
-//		y = _y;
-//		player = -1;
-//	}
-//
-//	public Piece(int _x, int _y, int _player) {
-//		x = _x;
-//		y = _y;
-//		player = _player;
-//	}
-
 	public Piece(int _x, int _y, int _player, boolean _dama) {
 		x = _x;
 		y = _y;
@@ -62,7 +50,8 @@ public class Piece {
 		if (current.y - 1 >= 0
 				&& checkBound((current.x + 2 * direction), current.y - 2,
 						board.length)
-						&& !isThere(sequence, current)
+						&& !isThere(sequence, new Point(current.x + 2
+								* direction, current.y - 2))
 				&& board[current.x + 2 * direction][current.y - 2] == null
 				&& board[current.x + 1 * direction][current.y - 1] != null
 				&& board[current.x + 1 * direction][current.y - 1].player != player) {
@@ -90,7 +79,8 @@ public class Piece {
 		if (board.length - current.y > 1
 				&& checkBound(current.x + 2 * direction, current.y + 2,
 						board.length)
-						&& !isThere(sequence, current)
+						&& !isThere(sequence, new Point(current.x + 2
+								* direction, current.y + 2))
 				&& board[current.x + 2 * direction][current.y + 2] == null
 				&& board[current.x + 1 * direction][current.y + 1] != null
 				&& board[current.x + 1 * direction][current.y + 1].player != player) {

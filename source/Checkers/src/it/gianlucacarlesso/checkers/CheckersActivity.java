@@ -23,6 +23,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -84,6 +85,12 @@ public class CheckersActivity extends Activity {
 
 		TextView strategy2 = (TextView) findViewById(R.id.strategy2);
 		strategy2.setTypeface(typface);
+		
+		TextView delay = (TextView) findViewById(R.id.delay);
+		delay.setTypeface(typface);
+		
+		EditText delay_value = (EditText) findViewById(R.id.delay_value);
+		delay_value.setTypeface(typface);
 
 		// Imposed on the content and appearance of the elements of the options
 		Spinner depth_value = (Spinner) findViewById(R.id.depth_value);
@@ -203,11 +210,6 @@ public class CheckersActivity extends Activity {
         	}
         	public void onNothingSelected(AdapterView<?> arg0) {}
 		});
-
-		// TODO REMOVE
-		// Intent intent = new Intent(this, CheckerboardActivity.class);
-		// intent.putExtra(CheckerboardActivity.GAME_MODE, 0);
-		// startActivity(intent);
 	}
 
 	public void startCheckerBoard(View view) {
@@ -226,6 +228,9 @@ public class CheckersActivity extends Activity {
 		} else {
 			intent.putExtra(CheckerboardActivity.GAME_MODE, 2);
 		}
+		intent.putExtra(CheckerboardActivity.DELAY,
+				Integer.valueOf(((EditText) findViewById(R.id.delay_value)).getText().toString()));
+		
 		startActivity(intent);
 	}
 

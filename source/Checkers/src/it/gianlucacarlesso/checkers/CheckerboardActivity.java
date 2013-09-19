@@ -19,7 +19,8 @@ public class CheckerboardActivity extends Activity {
 	public static String GAME_MODE = "game_mode";
 	public static String STRATEGY_PLAYER_BLACK = "strategy_black";
 	public static String STRATEGY_PLAYER_WHITE = "strategy_white";
-	
+	public static String DELAY = "delay";
+
 	private GBoard gboard;
 
 	@SuppressWarnings("deprecation")
@@ -78,23 +79,37 @@ public class CheckerboardActivity extends Activity {
 
 		gboard.stringNamePlayerBlack = player1.getText().toString();
 		gboard.stringNamePlayerWhite = player2.getText().toString();
-		
+
 		if (getIntent().getIntExtra(CheckerboardActivity.GAME_MODE, 0) == 0) {
 			// IA vs IA game mode
-			gboard.setStrategy(Player.PLAYER_BLACK, getIntent().getIntExtra(CheckerboardActivity.STRATEGY_PLAYER_BLACK, 0));
-			gboard.setStrategy(Player.PLAYER_WHITE, getIntent().getIntExtra(CheckerboardActivity.STRATEGY_PLAYER_WHITE, 0));
+			gboard.setStrategy(
+					Player.PLAYER_BLACK,
+					getIntent().getIntExtra(
+							CheckerboardActivity.STRATEGY_PLAYER_BLACK, 0));
+			gboard.setStrategy(
+					Player.PLAYER_WHITE,
+					getIntent().getIntExtra(
+							CheckerboardActivity.STRATEGY_PLAYER_WHITE, 0));
 		} else if (getIntent().getIntExtra(CheckerboardActivity.GAME_MODE, 0) == 1) {
 			// Man vs IA game mode
-			gboard.setStrategy(Player.PLAYER_BLACK, getIntent().getIntExtra(CheckerboardActivity.STRATEGY_PLAYER_BLACK, 0));
+			gboard.setStrategy(
+					Player.PLAYER_BLACK,
+					getIntent().getIntExtra(
+							CheckerboardActivity.STRATEGY_PLAYER_BLACK, 0));
+		}
+
+		if (getIntent().getIntExtra(CheckerboardActivity.DELAY, 0) > 0
+				&& getIntent().getIntExtra(CheckerboardActivity.DELAY, 0) < 5000) {
+			GBoard.DELAY = getIntent().getIntExtra(CheckerboardActivity.DELAY,
+					0);
 		}
 	}
 
-	   @Override
-	    public void onDestroy()
-	    {
-	        super.onDestroy();
-	        if(gboard.handlerIA != null && gboard.run_ia != null) {
-	        	gboard.handlerIA.removeCallbacks(gboard.run_ia);
-	        }
-	    }
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		if (gboard.handlerIA != null && gboard.run_ia != null) {
+			gboard.handlerIA.removeCallbacks(gboard.run_ia);
+		}
+	}
 }

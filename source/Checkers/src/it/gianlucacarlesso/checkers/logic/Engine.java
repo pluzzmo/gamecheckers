@@ -254,7 +254,7 @@ public class Engine {
 			return Strategy.simpleStrategy(this, player_in_turn,
 					moves_no_moves >= MAX_MOVES_NO_MOVES / 4);
 		case 1:
-			return Strategy.avarageStrategy(this, player_in_turn,
+			return Strategy.averageStrategy(this, player_in_turn,
 					moves_no_moves >= MAX_MOVES_NO_MOVES / 4);
 		default:
 			return Strategy.simpleStrategy(this, player_in_turn,

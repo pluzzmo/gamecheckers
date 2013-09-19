@@ -1,6 +1,6 @@
 <resources>
     <string-array name="strategy_array">
         <item>Simple Strategy</item>
-        <item>Avarage Strategy</item>
+        <item>Average Strategy</item>
     </string-array>
 </resources>

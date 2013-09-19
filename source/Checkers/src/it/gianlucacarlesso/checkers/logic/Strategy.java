@@ -36,7 +36,7 @@ public class Strategy {
 		return values;
 	}
 
-	public static double avarageStrategy(Engine engine, int playerTurn,
+	public static double averageStrategy(Engine engine, int playerTurn,
 			boolean isTheEnd) {
 		double values = 0;
 
