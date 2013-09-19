@@ -26,7 +26,7 @@ public class GBoard extends View {
 	private static Point SIZE_BOARD_ORIGIN = new Point(1319, 1406);
 	private static Point CENTER_BOARD_ORIGIN = new Point(649, 627);
 	private static Point SIZE_BOX_ORIGIN = new Point(140, 140);
-	private static int DELAY = 500;
+	private static int DELAY = 100;
 
 	private Engine engine = null;
 	public String stringNamePlayerBlack;

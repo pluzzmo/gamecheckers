@@ -55,10 +55,6 @@ public class Piece {
 
 	private void eatOpponentPawn(Piece[][] board,
 			ArrayList<ArrayList<Move>> moves, ArrayList<Move> sequence, int direction) {
-//		int direction = 1;
-//		if (player == Player.PLAYER_WHITE) {
-//			direction = -1;
-//		}
 
 		Point current = sequence.get(sequence.size() - 1).pointTo;
 
@@ -66,7 +62,7 @@ public class Piece {
 		if (current.y - 1 >= 0
 				&& checkBound((current.x + 2 * direction), current.y - 2,
 						board.length)
-						&& !isThere(sequence, new Point(current.x + 2 * direction, current.y - 2))
+						&& !isThere(sequence, current)
 				&& board[current.x + 2 * direction][current.y - 2] == null
 				&& board[current.x + 1 * direction][current.y - 1] != null
 				&& board[current.x + 1 * direction][current.y - 1].player != player) {
@@ -94,7 +90,7 @@ public class Piece {
 		if (board.length - current.y > 1
 				&& checkBound(current.x + 2 * direction, current.y + 2,
 						board.length)
-						&& !isThere(sequence, new Point(current.x + 2 * direction, current.y - 2))
+						&& !isThere(sequence, current)
 				&& board[current.x + 2 * direction][current.y + 2] == null
 				&& board[current.x + 1 * direction][current.y + 1] != null
 				&& board[current.x + 1 * direction][current.y + 1].player != player) {
@@ -121,7 +117,7 @@ public class Piece {
 	
 	public boolean isThere(ArrayList<Move> moves, Point point) {
 		for(int i=0;i<moves.size();i++) {
-			if(moves.get(i).pointFrom.x == point.x && moves.get(i).pointFrom.y == point.y) {
+			if(moves.get(i).pointTo.x == point.x && moves.get(i).pointTo.y == point.y) {
 				return true;
 			} 
 		}
