@@ -443,9 +443,9 @@ public class GBoard extends View {
 
 	public void setStrategy(int player, int strategy) {
 		if (player == Player.PLAYER_BLACK) {
-			engine.playerBlackStrategy = strategy;
+			Engine.playerBlackStrategy = strategy;
 		} else {
-			engine.playerWhiteStrategy = strategy;
+			Engine.playerWhiteStrategy = strategy;
 		}
 	}
 }
