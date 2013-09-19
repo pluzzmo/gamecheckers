@@ -10,17 +10,17 @@ public class Piece {
 	public int player;
 	public boolean dama = false;
 
-	public Piece(int _x, int _y) {
-		x = _x;
-		y = _y;
-		player = -1;
-	}
-
-	public Piece(int _x, int _y, int _player) {
-		x = _x;
-		y = _y;
-		player = _player;
-	}
+//	public Piece(int _x, int _y) {
+//		x = _x;
+//		y = _y;
+//		player = -1;
+//	}
+//
+//	public Piece(int _x, int _y, int _player) {
+//		x = _x;
+//		y = _y;
+//		player = _player;
+//	}
 
 	public Piece(int _x, int _y, int _player, boolean _dama) {
 		x = _x;
@@ -135,7 +135,7 @@ public class Piece {
 						sequence.add(new Move(new Point(x, y), new Point(x + 2
 								* direction, y - 2), dama, new Piece(x + 1
 								* direction, y - 1,
-								board[x + 1 * direction][y - 1].player)));
+								board[x + 1 * direction][y - 1].player, board[x + 1 * direction][y - 1].dama )));
 						moves.add(sequence);
 						eatOpponentPawn(board, moves, sequence);
 					}
@@ -163,7 +163,7 @@ public class Piece {
 						sequence.add(new Move(new Point(x, y), new Point(x + 2
 								* direction, y + 2), dama, new Piece(x + 1
 								* direction, y + 1,
-								board[x + 1 * direction][y + 1].player)));
+								board[x + 1 * direction][y + 1].player, board[x + 1 * direction][y + 1].dama)));
 						moves.add(sequence);
 						eatOpponentPawn(board, moves, sequence);
 					}

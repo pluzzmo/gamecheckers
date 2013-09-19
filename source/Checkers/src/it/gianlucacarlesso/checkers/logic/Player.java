@@ -34,7 +34,7 @@ public class Player {
 		}
 
 		for (int i = 0; i < PLAYER_PIECES; i++) {
-			pieces.add(i, new Piece(xpos, ypos, playerType));
+			pieces.add(i, new Piece(xpos, ypos, playerType, false));
 
 			ypos += 2;
 			if (ypos >= Engine.NUM_BOX_ROW) {
@@ -65,28 +65,23 @@ public class Player {
 			} else {
 				isMoved = NORMAL_MOVE;
 			}
-			
+
 			Piece piece = getPiece(from.x, from.y);
 			boolean isDama = piece.dama;
 			// Check if the pawn can become a dama
 			if (piece.dama == false && playerType == Player.PLAYER_BLACK
 					&& to.x == Engine.NUM_BOX_ROW - 1) {
 				isDama = true;
-			} else if (piece.dama == false && playerType == Player.PLAYER_WHITE && to.x == 0) {
+			} else if (piece.dama == false && playerType == Player.PLAYER_WHITE
+					&& to.x == 0) {
 				isDama = true;
 			}
 
 			moves.add(new Move(from, to, isDama, deleted));
 
-			for (int j = 0; j < pieces.size(); j++) {
-				if (pieces.get(j).x == from.x && pieces.get(j).y == from.y) {
-					pieces.get(j).x = to.x;
-					pieces.get(j).y = to.y;
-					if (pieces.get(j).dama == false && isDama == true) {
-						pieces.get(j).dama = isDama;
-					}
-				}
-			}
+			piece.x = to.x;
+			piece.y = to.y;
+			piece.dama = isDama;
 		}
 
 		return isMoved;
@@ -120,13 +115,11 @@ public class Player {
 
 			Point from = move.pointTo;
 			Point to = move.pointFrom;
-			for (int k = 0; k < pieces.size(); k++) {
-				if (pieces.get(k).x == from.x && pieces.get(k).y == from.y) {
-					pieces.get(k).x = to.x;
-					pieces.get(k).y = to.y;
-					pieces.get(k).dama = move.isDama;
-				}
-			}
+
+			Piece piece = getPiece(from.x, from.y);
+			piece.x = to.x;
+			piece.y = to.y;
+			piece.dama = move.isDama;
 
 			if (move.pawnDeleted != null) {
 				playerOpposing.pieces.add(move.pawnDeleted);

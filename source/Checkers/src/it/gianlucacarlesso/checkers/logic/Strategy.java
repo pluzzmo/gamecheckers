@@ -1,7 +1,5 @@
 package it.gianlucacarlesso.checkers.logic;
 
-import android.graphics.Point;
-
 public class Strategy {
 	public static int SIMPLE_STRATEGY = 0;
 	public static int AVARAGE_STRATEGY = 1;
@@ -32,11 +30,7 @@ public class Strategy {
 
 		if (isTheEnd) {
 			// Attack if they are in a position of advantage, otherwise run away
-			Point point = new Point();
-			int valuesTmp = sumDistances(player, playerOpposing, point);
-			if(Math.abs(point.x - point.y) >= 3) {
-				values = valuesTmp;
-			}
+			values += sumDistances(player, playerOpposing);
 		}
 
 		return values;
@@ -88,17 +82,13 @@ public class Strategy {
 
 		if (isTheEnd) {
 			// Attack if they are in a position of advantage, otherwise run away
-			Point point = new Point();
-			int valuesTmp = sumDistances(player, playerOpposing, point);
-			if(Math.abs(point.x - point.y) >= 3) {
-				values = valuesTmp;
-			}
+			values += sumDistances(player, playerOpposing);
 		}
 
 		return values;
 	}
 
-	private static int sumDistances(Player player, Player playerOpposing, Point point) {
+	private static int sumDistances(Player player, Player playerOpposing) {
 		int values = 0;
 
 		// I only watch dama
@@ -120,9 +110,6 @@ public class Strategy {
 			}
 		}
 		
-		point.x = damaPlayer;
-		point.y = damaPlayerOpposing;
-
 		if (damaPlayer >= damaPlayerOpposing) {
 			// i'm at an advantage
 			for (int i = 0; i < player.pieces.size(); i++) {
@@ -134,7 +121,8 @@ public class Strategy {
 						distance = Math.pow((double)(piecePlayer.x - piecePlayerOpposing.x),2);
 						distance += Math.pow((double)(piecePlayer.y - piecePlayerOpposing.y),2);
 						distance = Math.pow(distance, 0.5);
-						distance = Math.pow(distance, 1.75);
+						// distance = Math.pow(distance, 10);
+						distance = Math.pow(7/distance, 3);
 					}
 					values += distance;
 				}
@@ -150,7 +138,7 @@ public class Strategy {
 							distance = Math.pow((double)(piecePlayer.x - piecePlayerOpposing.x),2);
 							distance += Math.pow((double)(piecePlayer.y - piecePlayerOpposing.y),2);
 							distance = Math.pow(distance, 0.5);
-							distance = Math.pow(distance, 0.75);
+							distance = Math.pow(distance/7, 0.25);
 						}
 						values += distance;
 					}
