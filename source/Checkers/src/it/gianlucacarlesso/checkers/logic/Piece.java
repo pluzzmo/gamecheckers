@@ -54,11 +54,11 @@ public class Piece {
 	}
 
 	private void eatOpponentPawn(Piece[][] board,
-			ArrayList<ArrayList<Move>> moves, ArrayList<Move> sequence) {
-		int direction = 1;
-		if (player == Player.PLAYER_WHITE) {
-			direction = -1;
-		}
+			ArrayList<ArrayList<Move>> moves, ArrayList<Move> sequence, int direction) {
+//		int direction = 1;
+//		if (player == Player.PLAYER_WHITE) {
+//			direction = -1;
+//		}
 
 		Point current = sequence.get(sequence.size() - 1).pointTo;
 
@@ -66,6 +66,7 @@ public class Piece {
 		if (current.y - 1 >= 0
 				&& checkBound((current.x + 2 * direction), current.y - 2,
 						board.length)
+						&& !isThere(sequence, new Point(current.x + 2 * direction, current.y - 2))
 				&& board[current.x + 2 * direction][current.y - 2] == null
 				&& board[current.x + 1 * direction][current.y - 1] != null
 				&& board[current.x + 1 * direction][current.y - 1].player != player) {
@@ -81,7 +82,11 @@ public class Piece {
 						* direction][current.y - 1]));
 
 				moves.add(sequenceBuild);
-				eatOpponentPawn(board, moves, sequenceBuild);
+				eatOpponentPawn(board, moves, sequenceBuild, direction);
+				
+				if(dama) {
+					eatOpponentPawn(board, moves, sequenceBuild, -direction);	
+				}
 			}
 		}
 
@@ -89,6 +94,7 @@ public class Piece {
 		if (board.length - current.y > 1
 				&& checkBound(current.x + 2 * direction, current.y + 2,
 						board.length)
+						&& !isThere(sequence, new Point(current.x + 2 * direction, current.y - 2))
 				&& board[current.x + 2 * direction][current.y + 2] == null
 				&& board[current.x + 1 * direction][current.y + 1] != null
 				&& board[current.x + 1 * direction][current.y + 1].player != player) {
@@ -104,9 +110,22 @@ public class Piece {
 						* direction][current.y + 1]));
 
 				moves.add(sequenceBuild);
-				eatOpponentPawn(board, moves, sequenceBuild);
+				eatOpponentPawn(board, moves, sequenceBuild, direction);
+				
+				if(dama) {
+					eatOpponentPawn(board, moves, sequenceBuild, -direction);	
+				}
 			}
 		}
+	}
+	
+	public boolean isThere(ArrayList<Move> moves, Point point) {
+		for(int i=0;i<moves.size();i++) {
+			if(moves.get(i).pointFrom.x == point.x && moves.get(i).pointFrom.y == point.y) {
+				return true;
+			} 
+		}
+		return false;
 	}
 
 	private boolean checkBound(int xx, int yy, int lenght) {
@@ -137,7 +156,7 @@ public class Piece {
 								* direction, y - 1,
 								board[x + 1 * direction][y - 1].player, board[x + 1 * direction][y - 1].dama )));
 						moves.add(sequence);
-						eatOpponentPawn(board, moves, sequence);
+						eatOpponentPawn(board, moves, sequence, direction);
 					}
 				}
 			}
@@ -165,7 +184,7 @@ public class Piece {
 								* direction, y + 1,
 								board[x + 1 * direction][y + 1].player, board[x + 1 * direction][y + 1].dama)));
 						moves.add(sequence);
-						eatOpponentPawn(board, moves, sequence);
+						eatOpponentPawn(board, moves, sequence, direction);
 					}
 				}
 			}
