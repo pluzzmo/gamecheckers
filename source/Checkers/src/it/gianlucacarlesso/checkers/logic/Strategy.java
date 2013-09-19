@@ -59,7 +59,7 @@ public class Strategy {
 		for (int i = 0; i < player.pieces.size(); i++) {
 			// Prize the dama
 			if (player.pieces.get(i).dama) {
-				values = values + 10;
+				values = values + 12;
 			} else {
 				values = values + 1;
 
@@ -68,7 +68,7 @@ public class Strategy {
 						|| player.pieces.get(i).player == Player.PLAYER_WHITE
 						&& player.pieces.get(i).x < Engine.NUM_BOX_ROW
 								- (Engine.NUM_BOX_ROW / 2)) {
-					values = values + 5;
+					values = values + 4;
 				}
 			}
 		}
@@ -81,7 +81,7 @@ public class Strategy {
 						|| playerOpposing.pieces.get(i).player == Player.PLAYER_WHITE
 						&& playerOpposing.pieces.get(i).x < Engine.NUM_BOX_ROW
 								- (Engine.NUM_BOX_ROW / 2)) {
-					values = values - 7;
+					values = values - 8;
 				}
 			}
 		}

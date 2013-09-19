@@ -1,5 +1,6 @@
 package it.gianlucacarlesso.checkers;
 
+import it.gianlucacarlesso.checkers.logic.Engine;
 import it.gianlucacarlesso.checkers.logic.Strategy;
 import it.gianlucacarlesso.checkers.utilities.DisplayProperties;
 import it.gianlucacarlesso.checkers.utilities.ImageUtilities;
@@ -18,6 +19,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
@@ -76,8 +79,11 @@ public class CheckersActivity extends Activity {
 		TextView depth = (TextView) findViewById(R.id.depth);
 		depth.setTypeface(typface);
 
-		TextView strategy = (TextView) findViewById(R.id.strategy);
-		strategy.setTypeface(typface);
+		TextView strategy1 = (TextView) findViewById(R.id.strategy1);
+		strategy1.setTypeface(typface);
+
+		TextView strategy2 = (TextView) findViewById(R.id.strategy2);
+		strategy2.setTypeface(typface);
 
 		// Imposed on the content and appearance of the elements of the options
 		Spinner depth_value = (Spinner) findViewById(R.id.depth_value);
@@ -118,8 +124,15 @@ public class CheckersActivity extends Activity {
 		};
 		adapter_depth.setDropDownViewResource(R.layout.spinner_drop);
 		depth_value.setAdapter(adapter_depth);
+		depth_value.setOnItemSelectedListener(new OnItemSelectedListener() {
+        	public void onItemSelected(AdapterView<?> adapter, View view,int pos, long id) {
+        		String selected = (String)adapter.getItemAtPosition(pos);
+        		Engine.DEEP_SEARCH = Integer.valueOf(selected);
+        	}
+        	public void onNothingSelected(AdapterView<?> arg0) {}
+		});
 
-		Spinner strategy_value = (Spinner) findViewById(R.id.strategy_value);
+		Spinner strategy1_value = (Spinner) findViewById(R.id.strategy1_value);
 		list = Arrays.asList(getResources().getStringArray(
 				R.array.strategy_array));
 
@@ -156,9 +169,41 @@ public class CheckersActivity extends Activity {
 
 		};
 		adapter_strategy.setDropDownViewResource(R.layout.spinner_drop);
-		strategy_value.setAdapter(adapter_strategy);
-		
-		
+		strategy1_value.setAdapter(adapter_strategy);
+		strategy1_value.setOnItemSelectedListener(new OnItemSelectedListener() {
+        	public void onItemSelected(AdapterView<?> adapter, View view,int pos, long id) {
+        		String selected = (String)adapter.getItemAtPosition(pos);
+        		if(selected.compareTo(getResources().getString(R.string.simplestrategy)) == 0) {
+        		Engine.playerBlackStrategy = Strategy.SIMPLE_STRATEGY;
+        		} else {
+        			if(selected.compareTo(getResources().getString(R.string.avaragestrategy)) == 0) {
+                		Engine.playerBlackStrategy = Strategy.AVARAGE_STRATEGY;
+        			}
+        		}
+        	}
+        	public void onNothingSelected(AdapterView<?> arg0) {}
+		});
+
+		Spinner strategy2_value = (Spinner) findViewById(R.id.strategy2_value);
+		list = Arrays.asList(getResources().getStringArray(
+				R.array.strategy_array));
+
+		adapter_strategy.setDropDownViewResource(R.layout.spinner_drop);
+		strategy2_value.setAdapter(adapter_strategy);
+		strategy2_value.setOnItemSelectedListener(new OnItemSelectedListener() {
+        	public void onItemSelected(AdapterView<?> adapter, View view,int pos, long id) {
+        		String selected = (String)adapter.getItemAtPosition(pos);
+        		if(selected.compareTo(getResources().getString(R.string.simplestrategy)) == 0) {
+        		Engine.playerWhiteStrategy = Strategy.SIMPLE_STRATEGY;
+        		} else {
+        			if(selected.compareTo(getResources().getString(R.string.avaragestrategy)) == 0) {
+                		Engine.playerWhiteStrategy = Strategy.AVARAGE_STRATEGY;
+        			}
+        		}
+        	}
+        	public void onNothingSelected(AdapterView<?> arg0) {}
+		});
+
 		// TODO REMOVE
 		// Intent intent = new Intent(this, CheckerboardActivity.class);
 		// intent.putExtra(CheckerboardActivity.GAME_MODE, 0);

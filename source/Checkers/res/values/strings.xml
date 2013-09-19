@@ -23,6 +23,9 @@
     <string name="surrender">si arrende!</string>  
     <string name="depth">Profondità:</string>
     <string name="options">Opzioni</string>
-    <string name="strategy">F. euristica:</string>
+    <string name="strategy1">F. euristica P1:</string>
+    <string name="strategy2">F. euristica P2:</string>
+    <string name="simplestrategy">Simple Strategy</string>
+    <string name="avaragestrategy">Avarage Strategy</string>
 
 </resources>

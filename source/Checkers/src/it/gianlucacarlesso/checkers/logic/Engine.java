@@ -12,12 +12,12 @@ public class Engine {
 	public static int GAME_MODE_MAN_VS_MAN = 2;
 	public static int PLAYERS_PAR = -2;
 	public static int NO_WINNER = -1;
-	private static int DEEP_SEARCH = 5;
+	public static int DEEP_SEARCH = 5;
 	private static int MAX_MOVES_NO_MOVES = 60;
 	public int moves_no_moves = 0;
 
-	public int playerBlackStrategy = 0;
-	public int playerWhiteStrategy = 0;
+	public static int playerBlackStrategy = 0;
+	public static int playerWhiteStrategy = 0;
 
 	public static int NUM_BOX_ROW = 8;
 	public static int PLAYER_ROWS = 3;
